@@ -7,4 +7,4 @@ jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
-      - run: 'for i in 0 1 2 3 4 5; do curl -fsS --max-time 90 "https://snowchase-stats.vercel.app/api/snapshot?p=$i" > /dev/null || true; sleep 8; done'
+      - run: 'for i in 0 1 2 3 4 5 6 7 8 9 10 11 12; do curl -fsS --max-time 90 "https://snowchase-stats.vercel.app/api/snapshot?p=$i" > /dev/null || true; sleep 20; done'
