@@ -19,6 +19,8 @@ local FLUSH_EVERY = 60  -- limite HttpService = 500 requêtes/min/serveur
 local MAX_BATCH = 50
 
 if RunService:IsStudio() then return end -- ne rien envoyer depuis Studio
+if KEY == "REMPLACER_PAR_INGEST_KEY" then warn("[SnowChase] clé non renseignée : remplace KEY par ta valeur de INGEST_KEY") end
+print("[SnowChase] logger actif, version", game.PlaceVersion)
 
 local queue, joined, alive = {}, {}, {}
 local started, peak = os.time(), 0
@@ -41,6 +43,11 @@ local function sendOne()
 			Body = HttpService:JSONEncode({ events = batch }),
 		})
 	end)
+	if not ok then
+		warn("[SnowChase] envoi impossible (HttpService activé ?) :", res)
+	elseif not res.Success then
+		warn("[SnowChase] envoi refusé, code", res.StatusCode, res.Body) -- 401 = clé différente de INGEST_KEY
+	end
 	if not ok or not res.Success then -- on remet en file (bornée) pour réessayer
 		for i = #batch, 1, -1 do if #queue < 1000 then table.insert(queue, 1, batch[i]) end end
 		return false

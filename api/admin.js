@@ -15,7 +15,9 @@ async function readAll(prefix, cap) {
 export default async function handler(req, res) {
   if (!process.env.CRON_SECRET || req.query.k !== process.env.CRON_SECRET) return res.status(401).end();
   const day = /^\d{4}-\d{2}-\d{2}$/.test(req.query.day || "") ? req.query.day : new Date().toISOString().slice(0, 10);
-  const [s, v] = await Promise.all([readAll(`sessions/${day}/`, 400), readAll(`serveurs/${day}/`, 400)]);
+  const [s, v0] = await Promise.all([readAll(`sessions/${day}/`, 400), readAll(`serveurs/${day}/`, 400)]);
+  let roll = []; try { const g = await get(`serveurs/${day}.json`, { access: A(), useCache: false }); if (g && g.statusCode === 200) roll = JSON.parse(await new Response(g.stream).text()) } catch {}
+  const v = { files: v0.files + (roll.length ? 1 : 0), rows: [...v0.rows, ...roll] };
   const by = {}; s.rows.forEach(e => by[e.type] = (by[e.type] || 0) + 1);
   s.rows.sort((a, b) => a.t - b.t);
   res.setHeader("cache-control", "no-store");
