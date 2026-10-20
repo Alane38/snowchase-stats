@@ -3,8 +3,27 @@ on:
   schedule:
     - cron: "*/30 * * * *"
   workflow_dispatch: {}
+permissions:
+  contents: write
 jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
-      - run: 'for i in 0 1 2 3 4 5 6 7 8 9 10 11 12; do curl -fsS --max-time 90 "https://snowchase-stats.vercel.app/api/snapshot?p=$i" > /dev/null || true; sleep 40; done'
+      - uses: actions/checkout@v4
+      - name: Relevé complet puis archivage sur la branche data
+        run: |
+          mkdir -p /tmp/out
+          for i in 0 1 2 3 4 5 6 7 8 9 10 11 12; do
+            curl -sS --max-time 90 "https://snowchase-stats.vercel.app/api/snapshot?p=$i" -o /tmp/out/p$i.txt || echo "partie $i : echec curl" > /tmp/out/p$i.txt
+            sleep 40
+          done
+          D=$(date -u +%Y-%m-%dT%H-%M)
+          for i in 0 1 2 3 4 5 6 7 8 9 10 11 12; do cat /tmp/out/p$i.txt; echo; done > /tmp/snap.txt
+          git config user.name "snowchase-bot"
+          git config user.email "snowchase-bot@users.noreply.github.com"
+          if git fetch origin data; then git checkout -B data origin/data; else git checkout --orphan data; git rm -rf . > /dev/null; fi
+          mkdir -p releves
+          cp /tmp/snap.txt "releves/$D.txt"
+          git add releves
+          git commit -m "relevé $D"
+          git push origin data
