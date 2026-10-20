@@ -38,6 +38,8 @@ jobs:
           mkdir -p releves
           cp /tmp/snap.txt "releves/$D.txt"
           cp /tmp/public.json "releves/$D-public.json"
+          cp /tmp/snap.txt releves/latest.txt
+          cp /tmp/public.json releves/latest-public.json
           git add releves
           git commit -m "relevé $D ($ok/13 parties)"
           for a in 1 2 3; do
