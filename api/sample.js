@@ -9,6 +9,6 @@ export default async function handler(req, res) {
   if (!r || !r.ok) return res.status(502).json({ error: r ? r.status : "réseau" });
   j = await r.json();
   const t = Date.now(), s = (j.data || []).map(x => ({ id: x.id, n: x.playing, max: x.maxPlayers, fps: x.fps && +x.fps.toFixed(1), ping: x.ping }));
-  await put(`serveurs/${new Date(t).toISOString().slice(0, 10)}/${t}.json`, JSON.stringify({ t: Math.floor(t / 1000), s }), { access: "public", addRandomSuffix: false, contentType: "application/json" });
+  await put(`serveurs/${new Date(t).toISOString().slice(0, 10)}/${t}.json`, JSON.stringify({ t: Math.floor(t / 1000), s }), { access: process.env.BLOB_ACCESS || "private", addRandomSuffix: false, contentType: "application/json" });
   res.status(200).json({ servers: s.length, players: s.reduce((a, x) => a + x.n, 0) });
 }
