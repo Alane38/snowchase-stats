@@ -13,6 +13,7 @@ jobs:
       - name: Relevé complet puis archivage sur la branche data
         run: |
           mkdir -p /tmp/out
+          curl -sS --max-time 60 "https://snowchase-stats.vercel.app/api/public?x=$(date +%s)" -o /tmp/public.json || echo "{}" > /tmp/public.json
           for i in 0 1 2 3 4 5 6 7 8 9 10 11 12; do
             curl -sS --max-time 90 "https://snowchase-stats.vercel.app/api/snapshot?p=$i" -o /tmp/out/p$i.txt || echo "partie $i : echec curl" > /tmp/out/p$i.txt
             sleep 40
@@ -24,6 +25,7 @@ jobs:
           if git fetch origin data; then git checkout -B data origin/data; else git checkout --orphan data; git rm -rf . > /dev/null; fi
           mkdir -p releves
           cp /tmp/snap.txt "releves/$D.txt"
+          cp /tmp/public.json "releves/$D-public.json"
           git add releves
           git commit -m "relevé $D"
           git push origin data
