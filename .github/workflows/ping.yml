@@ -1,24 +1,36 @@
 name: ping
 on:
   schedule:
-    - cron: "*/30 * * * *"
+    - cron: "7,37 * * * *"
   workflow_dispatch: {}
 permissions:
   contents: write
+concurrency:
+  group: ping
+  cancel-in-progress: false
 jobs:
   ping:
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
       - name: Relevé complet puis archivage sur la branche data
         run: |
           mkdir -p /tmp/out
-          curl -sS --max-time 60 "https://snowchase-stats.vercel.app/api/public?x=$(date +%s)" -o /tmp/public.json || echo "{}" > /tmp/public.json
+          D=$(date -u +%Y-%m-%dT%H-%M)
+          curl -sS -f --max-time 60 "https://snowchase-stats.vercel.app/api/public?x=$(date +%s)" -o /tmp/public.json || echo "{}" > /tmp/public.json
+          ok=0
           for i in 0 1 2 3 4 5 6 7 8 9 10 11 12; do
-            curl -sS --max-time 90 "https://snowchase-stats.vercel.app/api/snapshot?p=$i" -o /tmp/out/p$i.txt || echo "partie $i : echec curl" > /tmp/out/p$i.txt
+            got=0
+            for a in 1 2; do
+              if curl -sS -f --max-time 90 "https://snowchase-stats.vercel.app/api/snapshot?p=$i&x=$(date +%s)" -o /tmp/out/p$i.txt; then got=1; break; fi
+              sleep 20
+            done
+            if [ "$got" = 1 ]; then ok=$((ok+1)); else echo "partie $i : echec apres 2 essais" > /tmp/out/p$i.txt; fi
             sleep 40
           done
-          D=$(date -u +%Y-%m-%dT%H-%M)
+          echo "parties recues : $ok/13"
+          if [ "$ok" -eq 0 ]; then echo "Aucune partie recue, rien a archiver"; exit 1; fi
           for i in 0 1 2 3 4 5 6 7 8 9 10 11 12; do cat /tmp/out/p$i.txt; echo; done > /tmp/snap.txt
           git config user.name "snowchase-bot"
           git config user.email "snowchase-bot@users.noreply.github.com"
@@ -27,5 +39,10 @@ jobs:
           cp /tmp/snap.txt "releves/$D.txt"
           cp /tmp/public.json "releves/$D-public.json"
           git add releves
-          git commit -m "relevé $D"
-          git push origin data
+          git commit -m "relevé $D ($ok/13 parties)"
+          for a in 1 2 3; do
+            git push origin data && break
+            git fetch origin data
+            git rebase origin/data
+          done
+          [ "$ok" -ge 10 ] || { echo "Relevé incomplet ($ok/13) : archivé mais marqué en échec"; exit 1; }
