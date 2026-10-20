@@ -18,7 +18,8 @@ local BEAT_EVERY = 15
 local FLUSH_EVERY = 60  -- limite HttpService = 500 requêtes/min/serveur
 local MAX_BATCH = 50
 
-if RunService:IsStudio() then return end -- ne rien envoyer depuis Studio
+local TEST_IN_STUDIO = false -- passe à true le temps d'un test dans Studio (les événements envoyés seront de vrais événements)
+if RunService:IsStudio() and not TEST_IN_STUDIO then return end -- ne rien envoyer depuis Studio
 if KEY == "REMPLACER_PAR_INGEST_KEY" then warn("[SnowChase] clé non renseignée : remplace KEY par ta valeur de INGEST_KEY") end
 print("[SnowChase] logger actif, version", game.PlaceVersion)
 

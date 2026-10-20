@@ -13,6 +13,7 @@ export default async function handler(req, res) {
     ev.push(...await many(l.blobs.map(b => b.pathname).slice(-500)));
     const roll = await txt(`serveurs/${d}.json`); if (roll) try { samples.push(...JSON.parse(roll)) } catch {}
   }
+  for (let i = ev.length - 1; i >= 0; i--) if (!ev[i].job) ev.splice(i, 1); // événements de test Studio (pas d'id de serveur) exclus des stats publiques
   ev.sort((a, b) => a.t - b.t); samples.sort((a, b) => a.t - b.t);
   // affluence : paquets de 10 minutes
   const B = {}; samples.forEach(x => { const k = Math.floor(x.t / 600) * 600, b = B[k] || (B[k] = { t: k, n: 0, pk: 0, sv: 0, fps: [], ping: [], c: 0 }); const tot = x.s.reduce((a, y) => a + y.n, 0); b.n += tot; b.c++; b.pk = Math.max(b.pk, tot); b.sv = Math.max(b.sv, x.s.length); x.s.forEach(y => { if (y.fps) b.fps.push(y.fps); if (y.ping) b.ping.push(y.ping) }) });
