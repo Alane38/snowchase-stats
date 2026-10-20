@@ -103,7 +103,7 @@ for _, p in ipairs(Players:GetPlayers()) do task.spawn(onAdded, p) end
 
 Players.PlayerRemoving:Connect(function(p)
 	local t0 = joined[p]; joined[p] = nil; alive[p] = nil; seenClient[p] = nil
-	push({ type = "leave", uid = p.UserId, name = p.Name, n = #Players:GetPlayers() - 1,
+	push({ type = "leave", uid = p.UserId, name = p.Name, n = #Players:GetPlayers(),
 		dur = t0 and (os.time() - t0) or nil })
 end)
 
