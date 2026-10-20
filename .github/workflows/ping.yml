@@ -1,0 +1,1 @@
+{name: ping, on: {schedule: [{cron: "*/30 * * * *"}], workflow_dispatch: {}}, jobs: {ping: {runs-on: ubuntu-latest, steps: [{run: "curl -fsS --max-time 90 https://snowchase-stats.vercel.app/api/snapshot"}]}}}
