@@ -13,6 +13,7 @@ local LocalizationService = game:GetService("LocalizationService")
 local MarketplaceService = game:GetService("MarketplaceService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Stats = game:GetService("Stats")
+local ServerScriptService = game:GetService("ServerScriptService")
 
 local ENDPOINT = "https://snowchase-stats.vercel.app/api/ingest"
 local KEY = "REMPLACER_PAR_INGEST_KEY" -- même valeur que la variable INGEST_KEY sur Vercel
@@ -154,6 +155,36 @@ local function onAdded(p)
 				start = start or root.Position
 				if (root.Position - start).Magnitude > 4 then phase(p, "move", nil, true); return end
 			end
+		end
+	end)
+end
+
+-- État du jeu : lecture seule, jamais bloquant (pcall). Une phase "une seule fois" par joueur et par serveur.
+local okState, GameState = pcall(function() return require(ServerScriptService.SnowChase.Core.State) end)
+if okState and type(GameState) == "table" and GameState.match then
+	task.spawn(function()
+		while true do
+			task.wait(1)
+			local ok = pcall(function()
+				local alone = #GameState.activePlayers() < GameState.playersNeeded()
+				for _, p in ipairs(Players:GetPlayers()) do
+					if joinedC[p] then
+						local label
+						if GameState.match.participants and GameState.match.participants[p] then label = "play"
+						elseif p:GetAttribute("InTutorial") == true or p:GetAttribute("TutorialLobby") == true then label = "tuto"
+						elseif p:GetAttribute("ProfileLoaded") ~= true then label = "loading"
+						elseif alone then label = "alone"
+						else label = "lobby" end
+						if label ~= "loading" then
+							local first = not (once[p] and once[p][label])
+							phase(p, label, nil, true)
+							if first and label == "play" then flushSoon() end
+						end
+						if p:GetAttribute("SnowChasePhase") == nil then cur[p] = label end
+					end
+				end
+			end)
+			if not ok then task.wait(4) end
 		end
 	end)
 end

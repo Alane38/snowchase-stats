@@ -23,7 +23,7 @@ export default async function handler(req, res) {
   Object.values(open).forEach(o => sess.push(o));
   const tracked = sess.filter(s => Object.keys(s.ph).length);
   const n = f => tracked.filter(f).length;
-  const funnel = { sessions: tracked.length, loaded: n(s => s.ph.loaded != null), spawn: n(s => s.ph.spawn != null), move: n(s => s.ph.move != null), play: n(s => s.ph.play != null), stay30: n(s => Number.isFinite(s.dur) && s.dur >= 30) };
+  const funnel = { sessions: tracked.length, loaded: n(s => s.ph.loaded != null), spawn: n(s => s.ph.spawn != null), move: n(s => s.ph.move != null), play: n(s => s.ph.play != null), alone: n(s => s.ph.alone != null), tuto: n(s => s.ph.tuto != null), stay30: n(s => Number.isFinite(s.dur) && s.dur >= 30) };
   const since = sess.filter(s => s.t >= CAMP), uniq = a => new Set(a.map(s => s.p).filter(Boolean)).size;
   const firstT = ev.length ? ev[0].t : null;
   res.setHeader("cache-control", "s-maxage=900, stale-while-revalidate=1800");
