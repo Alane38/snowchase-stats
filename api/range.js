@@ -34,7 +34,27 @@ export default async function handler(req, res) {
   ps.forEach(x => (x.c || []).forEach(q => { const g = q[2] === 1 ? 1 : q[2] === 0 ? 0 : -1; if (g < 0) return; const k = q[0] + "," + q[1]; P[g][k] = (P[g][k] || 0) + 1 }));
   const top = o => Object.entries(o).sort((a, b) => b[1] - a[1]).slice(0, 600).map(([k, n]) => { const [x, z] = k.split(",").map(Number); return [x, z, n] });
   const pos = { lobby: top(P[0]), play: top(P[1]), snaps: ps.length };
+  // retours, d'après les entrées et sorties (depuis le début du logger, 20/10 au soir) : qui revient, au bout de combien
+  // de temps, et par jour de premier passage la part revenue le lendemain (jours de Paris). « Premier passage » = première
+  // session vue par le logger, pas forcément la première de sa vie (le jeu existait avant)
+  const byP = {}; sess.forEach(s => { if (s.p && Number.isFinite(s.t)) (byP[s.p] = byP[s.p] || []).push(s) });
+  const gaps = [], visits = { 1: 0, 2: 0, 3: 0, "4+": 0 }, coh = {};
+  let returned = 0;
+  Object.values(byP).forEach(a => {
+    a.sort((x, y) => x.t - y.t);
+    const vs = [a[0]]; // une visite = une session qui commence plus d'1 min après la fin de la précédente (regroupement, reconnexion : même visite)
+    for (let i = 1; i < a.length; i++) { const prev = a[i - 1], end = prev.t + (prev.dur || 0); if (a[i].t - end > 60) { vs.push(a[i]); gaps.push(a[i].t - end) } }
+    const k = vs.length >= 4 ? "4+" : vs.length; visits[k]++; if (vs.length > 1) returned++;
+    const d0 = paris(vs[0].t).d, c = coh[d0] || (coh[d0] = { day: d0, first: 0, j1: 0, j7: 0 }); c.first++;
+    const days = new Set(vs.slice(1).map(v => paris(v.t).d)), next = new Date(Date.parse(d0 + "T12:00:00Z") + 864e5).toISOString().slice(0, 10);
+    if (days.has(next)) c.j1++;
+    if (vs.slice(1).some(v => v.t - vs[0].t <= 7 * 86400)) c.j7++;
+  });
+  const players = Object.keys(byP).length, gs = gaps.sort((x, y) => x - y);
+  const returns = { players, returned, returnedPct: players ? Math.round(returned / players * 100) : null, visits,
+    medianGapMin: gs.length ? Math.round(gs[gs.length >> 1] / 60) : null,
+    cohorts: Object.values(coh).sort((x, y) => x.day < y.day ? -1 : 1).map(c => ({ ...c, j1Pct: c.first ? Math.round(c.j1 / c.first * 100) : null, j7Pct: c.first ? Math.round(c.j7 / c.first * 100) : null })) };
   res.setHeader("cache-control", "s-maxage=900, stale-while-revalidate=1800");
-  res.status(200).json({ at: new Date().toISOString(), campStart: CAMP, from: firstT, heat, funnel, pos,
+  res.status(200).json({ at: new Date().toISOString(), campStart: CAMP, from: firstT, heat, funnel, pos, returns,
     campaign: { sessions: since.length, players: uniq(since), played: uniq(since.filter(s => s.ph.play != null)), complete: firstT != null && firstT <= CAMP + 3600 } });
 }
