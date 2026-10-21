@@ -1,6 +1,7 @@
 // Agrégats PUBLICS (aucun pseudo, aucun userId) calculés depuis Redis (événements, relevés des serveurs, battements).
 // Cache CDN 2 min pour limiter les lectures.
 import { ready, readEvents, readSamples, readBeats, day } from "./_db.js";
+import { sessionStats } from "./_stats.js";
 const med = a => { if (!a.length) return null; const s = [...a].sort((x, y) => x - y), m = s.length >> 1; return s.length % 2 ? s[m] : Math.round((s[m - 1] + s[m]) / 2) };
 export default async function handler(req, res) {
   if (!ready()) return res.status(503).json({ error: "base non configurée" });
@@ -16,8 +17,8 @@ export default async function handler(req, res) {
   const open = {}, sess = [], dev = {}, srv = {};
   ev.forEach(e => { const k = e.job + "|" + e.p;
     if (e.type === "client") dev[k] = e;
-    if (e.type === "join") open[k] = { p: e.p && e.p.slice(0, 6), job: e.job && e.job.slice(0, 8), jf: e.job, uid: e.uid, t: e.t, reg: e.reg, acct: e.acct, prem: e.prem, src: e.src, dur: null, deaths: 0, buys: 0, ph: {}, seq: [] };
-    else if (e.type === "leave") { const o = open[k] || { p: e.p && e.p.slice(0, 6), job: e.job && e.job.slice(0, 8), t: e.t - (e.dur || 0), deaths: 0, buys: 0, ph: {} }; o.dur = e.dur; o.end = e.t; sess.push(o); delete open[k] }
+    if (e.type === "join") open[k] = { k, p: e.p && e.p.slice(0, 6), job: e.job && e.job.slice(0, 8), jf: e.job, uid: e.uid, t: e.t, reg: e.reg, acct: e.acct, prem: e.prem, src: e.src, dur: null, deaths: 0, buys: 0, ph: {}, seq: [] };
+    else if (e.type === "leave") { const o = open[k] || { k, p: e.p && e.p.slice(0, 6), job: e.job && e.job.slice(0, 8), t: e.t - (e.dur || 0), deaths: 0, buys: 0, ph: {}, seq: [] }; o.dur = e.dur; o.end = e.t; sess.push(o); delete open[k] }
     else if (e.type === "phase" && open[k] && e.ph && Number.isFinite(e.dt)) { if (open[k].ph[e.ph] == null) open[k].ph[e.ph] = e.dt; open[k].last = e.ph; if (open[k].seq.length < 60) open[k].seq.push({ ph: e.ph, dt: e.dt }) }
     else if (e.type === "death" && open[k]) open[k].deaths++;
     else if (e.type === "purchase" && e.ok) { const o = open[k]; if (o) o.buys++ }
@@ -35,6 +36,7 @@ export default async function handler(req, res) {
     leftAfter: Object.entries(lv.filter(s => !s.live && s.last).reduce((o, s) => (o[s.last] = (o[s.last] || 0) + 1, o), {})).map(([name, n]) => ({ name, n })).sort((a, b) => b.n - a.n) };
   // versions publiées : comparer chaque publication à la précédente (durée, manche jouée, sessions longues)
   const versions = Object.entries(sess.reduce((o, s) => { const v = vOf(s); if (v) (o[v] = o[v] || []).push(s); return o }, {})).map(([v, a]) => { const d = a.filter(s => Number.isFinite(s.dur)); return { v: +v, sessions: a.length, t0: Math.min(...a.map(s => s.t)), medianSec: med(d.map(s => s.dur)), playPct: Math.round(a.filter(s => s.ph && s.ph.play != null).length / a.length * 100), over5Pct: d.length ? Math.round(d.filter(s => s.dur >= 300).length / d.length * 100) : null } }).sort((a, b) => b.v - a.v);
+  const stats = sessionStats(sess, dev, vOf);
   // matchmaking : relevés du jour où au moins 2 serveurs publics n'avaient qu'1 joueur (Roblox a séparé des joueurs seuls)
   const today = samples.filter(x => x.t >= Date.parse(days[1] + "T00:00:00Z") / 1000), splitS = today.filter(x => x.s.filter(y => y.n === 1).length >= 2);
   const split = { samples: today.length, splitSamples: splitS.length, lastAt: splitS.length ? splitS[splitS.length - 1].t : null, maxAlone: Math.max(0, ...today.map(x => x.s.filter(y => y.n === 1).length)) };
@@ -52,5 +54,5 @@ export default async function handler(req, res) {
       premium: sess.length ? +(sess.filter(s => s.prem).length / sess.length * 100).toFixed(1) : null, newAccounts: sess.length ? +(sess.filter(s => Number.isFinite(s.acct) && s.acct < 30).length / sess.length * 100).toFixed(1) : null, deaths: ev.filter(e => e.type === "death").length, purchases: ev.filter(e => e.type === "purchase" && e.ok).length },
     flow, servers: Object.values(srv).sort((a, b) => b.t0 - a.t0).slice(0, 50).map(s => ({ ...s, lifeSec: s.t1 - s.t0 })),
     sessions: sess.sort((a, b) => b.t - a.t).slice(0, 100).map(s => ({ p: s.p, job: s.job, t: s.t, dur: s.dur, reg: s.reg, acct: s.acct, prem: !!s.prem, src: s.src, deaths: s.deaths, live: !!s.live, load: s.ph && s.ph.loaded != null ? s.ph.loaded : null, spawn: s.ph && s.ph.spawn != null ? s.ph.spawn : null, move: s.ph && s.ph.move != null ? s.ph.move : null, play: s.ph && s.ph.play != null ? s.ph.play : null })),
-    phases, versions, split, online, regions: cnt(sess, s => s.reg), devices, sources: cnt(sess, s => s.src) });
+    phases, versions, stats, split, online, regions: cnt(sess, s => s.reg), devices, sources: cnt(sess, s => s.src) });
 }
