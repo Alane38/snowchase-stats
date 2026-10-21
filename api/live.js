@@ -18,7 +18,7 @@ export default async function handler(req, res) {
     if (e.type === "client") dev[k] = e;
     if (e.type === "join") open[k] = { p: e.p && e.p.slice(0, 6), job: e.job && e.job.slice(0, 8), t: e.t, reg: e.reg, acct: e.acct, prem: e.prem, src: e.src, dur: null, deaths: 0, buys: 0, ph: {} };
     else if (e.type === "leave") { const o = open[k] || { p: e.p && e.p.slice(0, 6), job: e.job && e.job.slice(0, 8), t: e.t - (e.dur || 0), deaths: 0, buys: 0, ph: {} }; o.dur = e.dur; o.end = e.t; sess.push(o); delete open[k] }
-    else if (e.type === "phase" && open[k] && e.ph && Number.isFinite(e.dt)) { if (open[k].ph[e.ph] == null) open[k].ph[e.ph] = e.dt }
+    else if (e.type === "phase" && open[k] && e.ph && Number.isFinite(e.dt)) { if (open[k].ph[e.ph] == null) open[k].ph[e.ph] = e.dt; open[k].last = e.ph }
     else if (e.type === "death" && open[k]) open[k].deaths++;
     else if (e.type === "purchase" && e.ok) { const o = open[k]; if (o) o.buys++ }
     if (e.job) { const s = srv[e.job] || (srv[e.job] = { job: e.job.slice(0, 8), t0: e.t, t1: e.t, peak: 0, joins: 0, v: e.v }); s.t0 = Math.min(s.t0, e.t); s.t1 = Math.max(s.t1, e.t); if (e.type === "join") s.joins++; if (Number.isFinite(e.n)) s.peak = Math.max(s.peak, e.n); if (e.type === "server_end" && e.peak) s.peak = Math.max(s.peak, e.peak) } });
@@ -26,6 +26,13 @@ export default async function handler(req, res) {
   Object.values(open).forEach(o => sess.push({ ...o, live: true }));
   const done = sess.filter(s => Number.isFinite(s.dur)), durs = done.map(s => s.dur);
   const tracked = done.filter(s => s.ph && Object.keys(s.ph).length), withPlay = done.filter(s => Number.isFinite(s.ph && s.ph.play)), playDurs = withPlay.map(s => Math.max(0, s.dur - s.ph.play)), loads = sess.map(s => s.ph && s.ph.loaded).filter(Number.isFinite);
+  // phases de la dernière version publiée (le suivi du tutoriel, du lobby et des manches en dépend) : combien de sessions
+  // atteignent chaque phase, en combien de secondes, et la dernière phase vue avant de quitter
+  const vOf = s => srv[Object.keys(srv).find(j => j.startsWith(s.job))]?.v, latest = Math.max(0, ...Object.values(srv).map(s => s.v || 0));
+  const lv = sess.filter(s => vOf(s) === latest), PH = {};
+  lv.forEach(s => Object.entries(s.ph || {}).forEach(([n, dt]) => (PH[n] = PH[n] || []).push(dt)));
+  const phases = { v: latest || null, sessions: lv.length, steps: Object.entries(PH).map(([name, a]) => ({ name, n: a.length, medDt: med(a.map(x => Math.round(x))) })).sort((a, b) => b.n - a.n),
+    leftAfter: Object.entries(lv.filter(s => !s.live && s.last).reduce((o, s) => (o[s.last] = (o[s.last] || 0) + 1, o), {})).map(([name, n]) => ({ name, n })).sort((a, b) => b.n - a.n) };
   const cnt = (a, f) => { const o = {}; a.forEach(x => { const k = f(x) || "inconnu"; o[k] = (o[k] || 0) + 1 }); return Object.entries(o).map(([name, n]) => ({ name, n })).sort((a, b) => b.n - a.n) };
   const devices = cnt(ev.filter(e => e.type === "client"), e => e.dev);
   res.setHeader("cache-control", "s-maxage=120, stale-while-revalidate=300");
@@ -35,5 +42,5 @@ export default async function handler(req, res) {
       premium: sess.length ? +(sess.filter(s => s.prem).length / sess.length * 100).toFixed(1) : null, newAccounts: sess.length ? +(sess.filter(s => Number.isFinite(s.acct) && s.acct < 30).length / sess.length * 100).toFixed(1) : null, deaths: ev.filter(e => e.type === "death").length, purchases: ev.filter(e => e.type === "purchase" && e.ok).length },
     flow, servers: Object.values(srv).sort((a, b) => b.t0 - a.t0).slice(0, 50).map(s => ({ ...s, lifeSec: s.t1 - s.t0 })),
     sessions: sess.sort((a, b) => b.t - a.t).slice(0, 100).map(s => ({ p: s.p, job: s.job, t: s.t, dur: s.dur, reg: s.reg, acct: s.acct, prem: !!s.prem, src: s.src, deaths: s.deaths, live: !!s.live, load: s.ph && s.ph.loaded != null ? s.ph.loaded : null, spawn: s.ph && s.ph.spawn != null ? s.ph.spawn : null, move: s.ph && s.ph.move != null ? s.ph.move : null, play: s.ph && s.ph.play != null ? s.ph.play : null })),
-    regions: cnt(sess, s => s.reg), devices, sources: cnt(sess, s => s.src) });
+    phases, regions: cnt(sess, s => s.reg), devices, sources: cnt(sess, s => s.src) });
 }
