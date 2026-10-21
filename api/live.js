@@ -31,6 +31,9 @@ export default async function handler(req, res) {
   Object.values(open).forEach(o => { const b = bt[o.jf], s = srv[o.jf];
     if (b && nowS - b.t < 300) sess.push({ ...o, live: true });
     else { const end = Math.max(o.t, s ? s.t1 : o.t, b ? b.t : o.t); sess.push({ ...o, dur: end - o.t, end, est: true }) } });
+  // sessions du propriétaire et de l'équipe (phase staff, depuis la v887) : hors des stats ; encore en jeu, elles restent
+  // dans les joueurs en ligne
+  let staff = 0; for (let i = sess.length - 1; i >= 0; i--) if (sess[i].ph && sess[i].ph.staff != null && !sess[i].live) { sess.splice(i, 1); staff++ }
   const done = sess.filter(s => Number.isFinite(s.dur)), durs = done.map(s => s.dur);
   const tracked = done.filter(s => s.ph && Object.keys(s.ph).length), withPlay = done.filter(s => Number.isFinite(s.ph && s.ph.play)), playDurs = withPlay.map(s => Math.max(0, s.dur - s.ph.play)), loads = sess.map(s => s.ph && s.ph.loaded).filter(Number.isFinite);
   // phases de la dernière version publiée (le suivi du tutoriel, du lobby et des manches en dépend) : combien de sessions
@@ -60,7 +63,7 @@ export default async function handler(req, res) {
   res.setHeader("cache-control", "s-maxage=120, stale-while-revalidate=300");
   res.status(200).json({ at: new Date().toISOString(), days,
     fresh: { event: ev.length ? ev[ev.length - 1].t : null, sample: samples.length ? samples[samples.length - 1].t : null, beat: Object.values(bt).reduce((m, b) => Math.max(m, b.t || 0), 0) || null },
-    totals: { sessions: sess.length, players: new Set(ev.filter(e => e.type === "join").map(e => e.p)).size, medianSec: med(durs), medianPlaySec: med(playDurs), medianLoadSec: loads.length ? +(med(loads.map(x => Math.round(x * 10))) / 10).toFixed(1) : null, leftBeforePlay: tracked.length && withPlay.length ? +((tracked.filter(s => !Number.isFinite(s.ph.play)).length) / tracked.length * 100).toFixed(1) : null, neverMoved: tracked.length ? +(tracked.filter(s => s.ph.move == null).length / tracked.length * 100).toFixed(1) : null, bounce: done.length ? +(done.filter(s => s.dur < 30).length / done.length * 100).toFixed(1) : null,
+    totals: { staffExcluded: staff, sessions: sess.length, players: new Set(ev.filter(e => e.type === "join").map(e => e.p)).size, medianSec: med(durs), medianPlaySec: med(playDurs), medianLoadSec: loads.length ? +(med(loads.map(x => Math.round(x * 10))) / 10).toFixed(1) : null, leftBeforePlay: tracked.length && withPlay.length ? +((tracked.filter(s => !Number.isFinite(s.ph.play)).length) / tracked.length * 100).toFixed(1) : null, neverMoved: tracked.length ? +(tracked.filter(s => s.ph.move == null).length / tracked.length * 100).toFixed(1) : null, bounce: done.length ? +(done.filter(s => s.dur < 30).length / done.length * 100).toFixed(1) : null,
       premium: sess.length ? +(sess.filter(s => s.prem).length / sess.length * 100).toFixed(1) : null, newAccounts: sess.length ? +(sess.filter(s => Number.isFinite(s.acct) && s.acct < 30).length / sess.length * 100).toFixed(1) : null, deaths: ev.filter(e => e.type === "death").length, purchases: ev.filter(e => e.type === "purchase" && e.ok).length },
     flow, servers: Object.values(srv).sort((a, b) => b.t0 - a.t0).slice(0, 50).map(s => ({ ...s, lifeSec: s.t1 - s.t0 })),
     sessions: sess.sort((a, b) => b.t - a.t).slice(0, 100).map(s => ({ p: s.p, job: s.job, t: s.t, dur: s.dur, reg: s.reg, acct: s.acct, prem: !!s.prem, src: s.src, deaths: s.deaths, live: !!s.live, load: s.ph && s.ph.loaded != null ? s.ph.loaded : null, spawn: s.ph && s.ph.spawn != null ? s.ph.spawn : null, move: s.ph && s.ph.move != null ? s.ph.move : null, play: s.ph && s.ph.play != null ? s.ph.play : null })),
