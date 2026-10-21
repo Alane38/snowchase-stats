@@ -35,11 +35,33 @@ export async function readEvents(days) {
     }
     if (m) out.push(...m.items);
   }
-  for (const k of memo.keys()) if (k < "ev:" + day(10)) memo.delete(k); // pas plus de 10 jours en mémoire
+  for (const k of memo.keys()) if (k.slice(3) < day(10)) memo.delete(k); // pas plus de 10 jours en mémoire
   return out;
 }
-export const readPos = async days => (await pipe(days.map(d => ["LRANGE", "ps:" + d, "-1500", "-1"]))).flatMap(parse);
-export const readSamples = async days => (await pipe(days.map(d => ["LRANGE", "sm:" + d, "-1500", "-1"]))).flatMap(parse);
+// relevés (sm:) et positions (ps:) : les 1 500 derniers de chaque jour, lus de la même façon incrémentale (seuls les
+// nouveaux depuis la dernière lecture ; un jour passé, une seule fois)
+const KEEP = 1500;
+async function readTail(prefix, days) {
+  const today = day(), need = days.filter(d => d === today || !memo.has(prefix + d));
+  const lens = need.length ? await pipe(need.map(d => ["LLEN", prefix + d])) : [];
+  const out = [];
+  for (const d of days) {
+    const key = prefix + d, i = need.indexOf(d);
+    let m = memo.get(key);
+    if (i >= 0) {
+      const n = lens[i] || 0;
+      if (!m || m.n > n) m = { n: Math.max(0, n - KEEP), items: [] };
+      if (n > m.n) m.items.push(...parse((await pipe([["LRANGE", key, String(Math.max(m.n, n - KEEP)), String(n - 1)]]))[0]));
+      m.n = n;
+      if (m.items.length > KEEP) m.items.splice(0, m.items.length - KEEP);
+      memo.set(key, m);
+    }
+    if (m) out.push(...m.items);
+  }
+  return out;
+}
+export const readPos = days => readTail("ps:", days);
+export const readSamples = days => readTail("sm:", days);
 export async function readBeats() {
   const k = await cmd("KEYS", "beat:*"); if (!k.length) return {};
   const v = await cmd("MGET", ...k), o = {};

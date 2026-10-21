@@ -67,7 +67,7 @@ export default async function handler(req, res) {
     return { p: o.p, v: b.v, state: pl.ph || o.last || null, idle: pl.idle ?? null, dev: c.dev || null, inp: c.inp || null, reg: o.reg || null, acct: acctB(o.acct), sec: now - o.t, seq: o.seq } }).sort((a, b) => a.sec - b.sec);
   const cnt = (a, f) => { const o = {}; a.forEach(x => { const k = f(x) || "inconnu"; o[k] = (o[k] || 0) + 1 }); return Object.entries(o).map(([name, n]) => ({ name, n })).sort((a, b) => b.n - a.n) };
   const devices = cnt(Object.entries(dev).filter(([k]) => !filtered || fk.has(k)).map(([, e]) => e), e => e.dev);
-  res.setHeader("cache-control", "s-maxage=120, stale-while-revalidate=300");
+  res.setHeader("cache-control", "s-maxage=20, stale-while-revalidate=60"); // lecture incrémentale : recalculer coûte peu
   res.status(200).json({ at: new Date().toISOString(), days,
     fresh: { event: ev.length ? ev[ev.length - 1].t : null, sample: samples.length ? samples[samples.length - 1].t : null, beat: Object.values(bt).reduce((m, b) => Math.max(m, b.t || 0), 0) || null },
     filter: filtered ? { v: fv, from: ff, to: ft, sessions: fs.length } : null,
