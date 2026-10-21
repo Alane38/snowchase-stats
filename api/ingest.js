@@ -29,7 +29,10 @@ export default async function handler(req, res) {
   const rest = clean.filter(e => e.type !== "beat"), lastBeat = {};
   clean.filter(e => e.type === "beat" && e.job).forEach(b => { lastBeat[b.job] = b });
   const cmds = [];
-  if (rest.length) cmds.push(["RPUSH", "ev:" + day(), ...rest.map(e => JSON.stringify(e))]);
+  // sans les champs vides (moitié moins de place : une phase passe de ~350 à ~180 octets) ; les lecteurs testent déjà
+  // chaque champ (Number.isFinite, === true) ; une journée reste 35 jours dans Redis, l'archive (branche data) la garde ensuite
+  const lean = e => JSON.stringify(e, (k, v) => v === null || v === false ? undefined : v);
+  if (rest.length) cmds.push(["RPUSH", "ev:" + day(), ...rest.map(lean)], ["EXPIRE", "ev:" + day(), String(35 * 86400)]);
   Object.values(lastBeat).forEach(b => cmds.push(["SET", "beat:" + b.job, JSON.stringify(b), "EX", "172800"]));
   // positions : une photo grossière toutes les 2 min et par serveur (cases de 20 studs, sans identifiant) = 1 commande
   clean.filter(e => e.type === "beat" && e.pl && e.t % 120 < 15).forEach(b => {
