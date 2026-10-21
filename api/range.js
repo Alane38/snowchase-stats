@@ -1,4 +1,4 @@
-// Agrégats PUBLICS sur toute la durée conservée (8 jours) : carte des heures de pointe, parcours de session (entonnoir),
+// Agrégats PUBLICS depuis le lancement de la campagne : 8 derniers jours lus dans Redis, jours plus anciens relus dans l'archive anonymisée (branche data) : carte des heures de pointe, parcours de session (entonnoir),
 // joueurs depuis le lancement de la campagne. Aucun pseudo ni identifiant. Cache CDN 15 min (environ 20 commandes Redis par recalcul).
 import { ready, readEvents, readSamples, day } from "./_db.js";
 const CAMP = Date.parse("2026-10-19T19:30:00Z") / 1000; // lancement de la campagne : 19/10/2026 21h30 à Paris
@@ -7,8 +7,11 @@ const paris = t => { const o = {}; F.formatToParts(new Date(t * 1000)).forEach(p
 export default async function handler(req, res) {
   if (!ready()) return res.status(503).json({ error: "base non configurée" });
   const ds = Array.from({ length: 8 }, (_, i) => day(i));
+  const older = []; for (let i = 8; i < 60; i++) { const d = day(i); if (d < new Date(CAMP * 1000).toISOString().slice(0, 10)) break; older.push(d) }
   let ev, sm;
   try { [ev, sm] = await Promise.all([readEvents(ds), readSamples(ds)]) } catch { return res.status(502).json({ error: "base indisponible" }) }
+  const arch = await Promise.all(older.map(async d => { try { const r = await fetch("https://raw.githubusercontent.com/Alane38/snowchase-stats/data/sessions/" + d + ".json"); return r.ok ? await r.json() : null } catch { return null } }));
+  arch.forEach(a => { if (a && Array.isArray(a.events)) { ev = ev.concat(a.events); sm = sm.concat(Array.isArray(a.samples) ? a.samples : []) } });
   ev = ev.filter(e => e.job).sort((a, b) => a.t - b.t);
   // heures de pointe : moyenne des joueurs en ligne par (jour, heure) à Paris
   const H = {};
