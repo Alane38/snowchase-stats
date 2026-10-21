@@ -26,7 +26,7 @@
       ]
     },
     {
-      "source": "/(admin|admin.html|api/admin)",
+      "source": "/api/admin",
       "headers": [
         {
           "key": "X-Robots-Tag",
@@ -39,10 +39,11 @@
       ]
     }
   ],
-  "rewrites": [
+  "redirects": [
     {
       "source": "/admin",
-      "destination": "/admin.html"
+      "destination": "/#admin",
+      "permanent": false
     }
   ]
 }
