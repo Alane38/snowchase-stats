@@ -23,8 +23,8 @@ export function sessionStats(sess, dev, vOf) {
   all.forEach(s => { const v = vOf(s); if (!v) return; const o = V[v] || (V[v] = { v, sessions: 0, newP: 0, d0: 0, d1: 0 }); o.sessions++; if (has(s, "new_player")) o.newP++; if (has(s, "back_d0")) o.d0++; if (has(s, "back_d1")) o.d1++ });
 
   // manches : le détail rd/rdb des 5 premières, sinon r1_won / r1_lost / r2 (versions plus anciennes)
-  const first = { real: [0, 0], bot: [0, 0], any: [0, 0] }, after = { l: [0, 0], w: [0, 0] };
-  let played = 0, second = 0, rounds = 0, hits = 0, throws = 0;
+  const first = { real: [0, 0], bot: [0, 0], any: [0, 0] }, after = { l: [0, 0], w: [0, 0], solo: [0, 0], group: [0, 0] };
+  let played = 0, second = 0, rounds = 0, hits = 0, throws = 0, pro = 0;
   all.forEach(s => {
     const seq = s.seq || [], rs = seq.map(x => ({ x, m: x.ph.match(RD) })).filter(y => y.m);
     let last = null;
@@ -41,13 +41,19 @@ export function sessionStats(sess, dev, vOf) {
       first.any[0]++; if (r1.ph === "r1_won") first.any[1]++;
       last = has(s, "r2") ? null : { won: r1.ph === "r1_won", dt: r1.dt };
     }
-    if (last && !s.live && Number.isFinite(s.dur)) { const b = after[last.won ? "w" : "l"]; b[0]++; if (s.dur - last.dt <= QUIT_AFTER) b[1]++ }
+    if (has(s, "pro_on")) pro++;
+    if (last && !s.live && Number.isFinite(s.dur)) {
+      const quit = s.dur - last.dt <= QUIT_AFTER;
+      // gagné / perdu, et seul au lobby ensuite (solo_after_round, depuis la v886) ou non
+      [after[last.won ? "w" : "l"], after[has(s, "solo_after_round") ? "solo" : "group"]].forEach(b => { b[0]++; if (quit) b[1]++ });
+    }
   });
   const rate = a => ({ n: a[0], pct: pct(a[1], a[0]) });
   const roundsOut = { sessions: all.length, played, playedPct: pct(played, all.length), secondPct: pct(second, played),
     first: { real: rate(first.real), bot: rate(first.bot), any: rate(first.any) }, detailed: rounds,
     avgHits: rounds ? +(hits / rounds).toFixed(1) : null, avgThrows: rounds ? +(throws / rounds).toFixed(1) : null, accuracyPct: pct(hits, throws),
-    quitAfterLoss: rate(after.l), quitAfterWin: rate(after.w), quitSeconds: QUIT_AFTER };
+    quitAfterLoss: rate(after.l), quitAfterWin: rate(after.w), quitAfterSolo: rate(after.solo), quitAfterGroup: rate(after.group),
+    proPct: pct(pro, played), quitSeconds: QUIT_AFTER };
 
   // économie : flocons gagnés (paliers earn_), dépensés (spend_), boutique ouverte sans achat, achats par skin, roue
   const tracked = all.filter(s => Object.keys(s.ph).some(n => n.startsWith("earn_") || n.startsWith("spend_") || n === "open_shop" || n.startsWith("buy_")));
