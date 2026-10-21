@@ -31,7 +31,7 @@ export default async function handler(req, res) {
   const done = sess.filter(s => Number.isFinite(s.dur)), durs = done.map(s => s.dur);
   const cnt = (a, f) => { const o = {}; a.forEach(x => { const k = f(x) || "inconnu"; o[k] = (o[k] || 0) + 1 }); return Object.entries(o).map(([name, n]) => ({ name, n })).sort((a, b) => b.n - a.n) };
   const devices = cnt(ev.filter(e => e.type === "client"), e => e.dev);
-  res.setHeader("cache-control", "s-maxage=600, stale-while-revalidate=600");
+  res.setHeader("cache-control", "s-maxage=120, stale-while-revalidate=300");
   res.status(200).json({ at: new Date().toISOString(), days,
     totals: { sessions: sess.length, players: new Set(ev.filter(e => e.type === "join").map(e => e.p)).size, medianSec: med(durs), bounce: done.length ? +(done.filter(s => s.dur < 30).length / done.length * 100).toFixed(1) : null,
       premium: sess.length ? +(sess.filter(s => s.prem).length / sess.length * 100).toFixed(1) : null, newAccounts: sess.length ? +(sess.filter(s => Number.isFinite(s.acct) && s.acct < 30).length / sess.length * 100).toFixed(1) : null, deaths: ev.filter(e => e.type === "death").length, purchases: ev.filter(e => e.type === "purchase" && e.ok).length },

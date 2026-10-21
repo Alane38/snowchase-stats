@@ -9,5 +9,5 @@ j("https://games.roblox.com/v1/games/"+P+"/servers/Public?limit=100"),
 j("https://apis.roblox.com/game-passes/v1/universes/"+U+"/game-passes?passView=Full&pageSize=50"),
 j("https://thumbnails.roblox.com/v1/games/icons?universeIds="+U+"&size=256x256&format=Png")]);
 res.setHeader("content-type","application/json; charset=utf-8");
-res.setHeader("cache-control","s-maxage=300, stale-while-revalidate=300");
+res.setHeader("cache-control","s-maxage=30, stale-while-revalidate=60");
 res.status(200).send(JSON.stringify({at:new Date().toISOString(),game,votes,badges,servers,passes,icon}))}
