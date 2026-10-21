@@ -381,7 +381,9 @@ r.appendChild(pn("",table([{k:"t",t:"Entrée"},{k:"p",t:"Joueur (code)"},{k:"dur
 function sessServeurs(r){const d=sessData(r);if(!d)return;const sr=S.live&&S.live.d?arr(S.live.d.servers):[];
 H2(r,"Serveurs","Serveurs publics de Roblox et serveurs vus par le logger du jeu.");
 const short=d.servers.filter(x=>x.lifeSec<60).length;r.appendChild(concl(d.servers.length+" serveurs vus sur 48 h"+(short?", dont "+short+" fermés en moins d'1 min (joueur reparti aussitôt, ou serveur arrêté)":"")+".",short>=3?"warn":""));
-if(sr.length)r.appendChild(pn("Ouverts maintenant",table([{k:"id",t:"Serveur"},{k:"playing",t:"Joueurs",num:1},{k:"maxPlayers",t:"Max",num:1},{k:"fps",t:"FPS",num:1,f:v=>v==null?"–":v.toFixed(0)},{k:"ping",t:"Ping (ms)",num:1}],sr.map(x=>({id:String(x.id||"").slice(0,8),playing:x.playing,maxPlayers:x.maxPlayers,fps:x.fps,ping:x.ping})),{sort:"playing",name:"serveurs"})));
+// depuis quand chaque serveur tourne : son premier signal vu par le logger (battement ou entrée), relié par l'id court
+const upOf=id=>{const x=d.servers.find(y=>y.job===id);return x&&x.t0?Math.max(0,Date.now()/1e3-x.t0):null};
+if(sr.length)r.appendChild(pn("Ouverts maintenant",table([{k:"id",t:"Serveur"},{k:"up",t:"Ouvert depuis",num:1,f:v=>v==null?"–":v<3600?fsd(v):Math.floor(v/3600)+" h "+String(Math.floor(v%3600/60)).padStart(2,"0")},{k:"playing",t:"Joueurs",num:1},{k:"maxPlayers",t:"Max",num:1},{k:"fps",t:"FPS",num:1,f:v=>v==null?"–":v.toFixed(0)},{k:"ping",t:"Ping (ms)",num:1}],sr.map(x=>{const id=String(x.id||"").slice(0,8);return{id,up:upOf(id),playing:x.playing,maxPlayers:x.maxPlayers,fps:x.fps,ping:x.ping}}),{sort:"playing",name:"serveurs"})));
 const mk=(n,k)=>({name:n,pts:d.flow.map(x=>({t:tpS(x.t),v:x[k],p:false}))});
 if(d.flow.length)r.appendChild(c3(cols(pn("Serveurs ouverts en même temps",chart([mk("Serveurs","servers")],{end:1,w:370,h:170})),pn("FPS serveur moyen",chart([mk("FPS","fps")],{end:1,w:370,h:170})),pn("Ping moyen (ms)",chart([mk("Ping","ping")],{end:1,w:370,h:170})))));
 H2(r,"Historique des serveurs","Durée = première à dernière activité du serveur.");
