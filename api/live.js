@@ -1,18 +1,12 @@
-// Agrégats PUBLICS (aucun pseudo, aucun userId) calculés depuis les blobs sessions/ et serveurs/.
-// Cache CDN 10 min pour limiter les lectures de blobs.
-import { list, get } from "@vercel/blob";
-const A = () => process.env.BLOB_ACCESS || "private";
-const txt = async p => { try { const g = await get(p, { access: A() }); return g && g.statusCode === 200 ? await new Response(g.stream).text() : null } catch { return null } };
-async function many(paths) { const out = []; for (let i = 0; i < paths.length; i += 10) out.push(...await Promise.all(paths.slice(i, i + 10).map(async p => { const t = await txt(p); try { return t ? JSON.parse(t) : [] } catch { return [] } }))); return out.flat() }
+// Agrégats PUBLICS (aucun pseudo, aucun userId) calculés depuis Redis (événements, relevés des serveurs, battements).
+// Cache CDN 2 min pour limiter les lectures.
+import { ready, readEvents, readSamples, readBeats, day } from "./_db.js";
 const med = a => { if (!a.length) return null; const s = [...a].sort((x, y) => x - y), m = s.length >> 1; return s.length % 2 ? s[m] : Math.round((s[m - 1] + s[m]) / 2) };
 export default async function handler(req, res) {
-  const days = [1, 0].map(d => new Date(Date.now() - d * 864e5).toISOString().slice(0, 10));
-  const ev = [], samples = [];
-  for (const d of days) {
-    const l = await list({ prefix: `sessions/${d}/`, limit: 1000 });
-    ev.push(...await many(l.blobs.map(b => b.pathname).slice(-500)));
-    const roll = await txt(`serveurs/${d}.json`); if (roll) try { samples.push(...JSON.parse(roll)) } catch {}
-  }
+  if (!ready()) return res.status(503).json({ error: "base non configurée" });
+  const days = [1, 0].map(d => day(d));
+  let ev, samples, bt;
+  try { [ev, samples, bt] = await Promise.all([readEvents(days), readSamples(days), readBeats()]) } catch (e) { return res.status(502).json({ error: "base indisponible" }) }
   for (let i = ev.length - 1; i >= 0; i--) if (!ev[i].job) ev.splice(i, 1); // événements de test Studio (pas d'id de serveur) exclus des stats publiques
   ev.sort((a, b) => a.t - b.t); samples.sort((a, b) => a.t - b.t);
   // affluence : paquets de 10 minutes
@@ -28,6 +22,7 @@ export default async function handler(req, res) {
     else if (e.type === "death" && open[k]) open[k].deaths++;
     else if (e.type === "purchase" && e.ok) { const o = open[k]; if (o) o.buys++ }
     if (e.job) { const s = srv[e.job] || (srv[e.job] = { job: e.job.slice(0, 8), t0: e.t, t1: e.t, peak: 0, joins: 0, v: e.v }); s.t0 = Math.min(s.t0, e.t); s.t1 = Math.max(s.t1, e.t); if (e.type === "join") s.joins++; if (Number.isFinite(e.n)) s.peak = Math.max(s.peak, e.n); if (e.type === "server_end" && e.peak) s.peak = Math.max(s.peak, e.peak) } });
+  Object.values(bt).forEach(b => { if (!b.job) return; const s = srv[b.job] || (srv[b.job] = { job: b.job.slice(0, 8), t0: b.t - (b.up || 0), t1: b.t, peak: 0, joins: 0, v: b.v }); s.t1 = Math.max(s.t1, b.t); if (Number.isFinite(b.n)) s.peak = Math.max(s.peak, b.n) });
   Object.values(open).forEach(o => sess.push({ ...o, live: true }));
   const done = sess.filter(s => Number.isFinite(s.dur)), durs = done.map(s => s.dur);
   const withPlay = done.filter(s => Number.isFinite(s.ph && s.ph.play)), playDurs = withPlay.map(s => Math.max(0, s.dur - s.ph.play)), loads = sess.map(s => s.ph && s.ph.loaded).filter(Number.isFinite);

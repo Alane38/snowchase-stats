@@ -13,9 +13,10 @@ table{width:100%;border-collapse:collapse;background:var(--pn);border:1px solid 
 .wrap{overflow-x:auto}.empty{padding:18px;color:var(--mut);background:var(--pn);border:1px dashed var(--ln);border-radius:12px}.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--ok);margin-right:6px}.err{color:var(--wa)}
 </style></head><body><main>
 <h1>En direct</h1><p class="sub">Vue privée : pseudos, têtes et état des joueurs. Ne pas partager ce lien ni la clé. Actualisation toutes les 20 s ; les données arrivent du jeu avec jusqu'à 1 minute de retard.</p>
-<div class="bar"><input id="k" type="password" placeholder="Clé d'accès (CRON_SECRET)" autocomplete="off"><button id="go">Afficher</button><span id="st" class="pill">en attente de clé</span></div>
+<div class="bar"><input id="k" type="password" placeholder="Clé d'accès (CRON_SECRET)" autocomplete="off"><button id="go">Afficher</button><span id="st" class="pill">en attente de clé</span><button id="mg" title="À lancer une seule fois, après avoir branché Upstash Redis" style="background:var(--pn);color:var(--tx);border:1px solid var(--ln)">Importer l'ancien stockage</button></div>
 <div id="out"></div>
 <script>
+document.addEventListener("DOMContentLoaded",()=>{const m=document.getElementById("mg");if(m)m.onclick=async()=>{const k=document.getElementById("k").value||KEY;if(!k)return alert("Entre d'abord la clé");m.disabled=true;try{const r=await fetch("/api/admin?view=migrate",{headers:{"x-key":k}});alert(r.status+" "+(await r.text()).slice(0,600))}catch(e){alert(String(e))}m.disabled=false}});
 const $=s=>document.querySelector(s),h=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e};
 let KEY="",timer=null;try{KEY=sessionStorage.getItem("k")||""}catch(e){}
 const fs=s=>s==null?"–":s<60?s+" s":Math.floor(s/60)+" min "+String(Math.round(s%60)).padStart(2,"0")+" s",
