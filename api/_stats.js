@@ -10,12 +10,17 @@ const QUIT_AFTER = 40; // secondes : un départ dans ce délai après la fin d'u
 
 export function sessionStats(sess, dev, vOf) {
   const all = sess.filter(s => s.ph && Object.keys(s.ph).length), has = (s, n) => s.ph[n] != null;
+  // une mesure n'existe que depuis la version du jeu qui l'envoie : son dénominateur ne prend que les sessions de cette
+  // version et des suivantes (avant, les sessions plus anciennes la faisaient paraître rare : 0 % d'amis, 12 % de manches)
+  const since = test => { const vs = all.filter(s => Object.keys(s.ph).some(test)).map(vOf).filter(Boolean); if (!vs.length) return [];
+    const v0 = Math.min(...vs); return all.filter(s => (vOf(s) || 0) >= v0) };
   const done = all.filter(s => !s.live && Number.isFinite(s.dur));
 
   // fidélité : nouveaux, revenus le jour même, le lendemain ; rétention J1 estimée = revenus le lendemain le jour J /
   // nouveaux le jour J-1 (les jours doivent se suivre)
   const D = {};
   all.forEach(s => { const d = paris(s.t), o = D[d] || (D[d] = { day: d, sessions: 0, newP: 0, d0: 0, d1: 0, d2_7: 0, d8p: 0 }); o.sessions++;
+    if (Object.keys(s.ph).some(n => n === "new_player" || n.startsWith("back_d"))) o.classed = (o.classed || 0) + 1;
     if (has(s, "new_player")) o.newP++; if (has(s, "back_d0")) o.d0++; if (has(s, "back_d1")) o.d1++; if (has(s, "back_d2_7")) o.d2_7++; if (has(s, "back_d8p")) o.d8p++ });
   const days = Object.values(D).sort((a, b) => a.day < b.day ? -1 : 1);
   days.forEach((o, i) => { const p = days[i - 1], next = p && Date.parse(o.day) - Date.parse(p.day) === 864e5; o.prevNew = next ? p.newP : null; o.retD1 = next && p.newP ? pct(o.d1, p.newP) : null });
@@ -49,26 +54,30 @@ export function sessionStats(sess, dev, vOf) {
     }
   });
   const rate = a => ({ n: a[0], pct: pct(a[1], a[0]) });
-  const roundsOut = { sessions: all.length, played, playedPct: pct(played, all.length), secondPct: pct(second, played),
+  const withPlay = all.filter(s => has(s, "play")).length; // entré dans une manche (étiquette du logger, toutes versions)
+  const roundsOut = { sessions: all.length, played: withPlay, detailedSessions: played, playedPct: pct(withPlay, all.length), secondPct: pct(second, played),
     first: { real: rate(first.real), bot: rate(first.bot), any: rate(first.any) }, detailed: rounds,
     avgHits: rounds ? +(hits / rounds).toFixed(1) : null, avgThrows: rounds ? +(throws / rounds).toFixed(1) : null, accuracyPct: pct(hits, throws),
     quitAfterLoss: rate(after.l), quitAfterWin: rate(after.w), quitAfterSolo: rate(after.solo), quitAfterGroup: rate(after.group),
-    proPct: pct(pro, played), quitSeconds: QUIT_AFTER };
+    proPct: (() => { const b = since(n => n === "pro_on" || n === "solo_after_round").filter(s => has(s, "play")); return b.length ? pct(b.filter(s => has(s, "pro_on")).length, b.length) : null })(), quitSeconds: QUIT_AFTER };
 
   // économie : flocons gagnés (paliers earn_), dépensés (spend_), boutique ouverte sans achat, achats par skin, roue
   const tracked = all.filter(s => Object.keys(s.ph).some(n => n.startsWith("earn_") || n.startsWith("spend_") || n === "open_shop" || n.startsWith("buy_")));
   const shop = all.filter(s => has(s, "open_shop")), bought = s => Object.keys(s.ph).some(n => (n.startsWith("buy_") && n !== "buy_refused") || n.startsWith("spend_"));
   const buys = {}; all.forEach(s => Object.keys(s.ph).forEach(n => { if (n.startsWith("buy_") && n !== "buy_refused") buys[n.slice(4)] = (buys[n.slice(4)] || 0) + 1 }));
-  const earnBase = all.filter(s => Object.keys(s.ph).some(n => n.startsWith("earn_")) || has(s, "play")).length;
-  const economy = { sessions: all.length, measured: tracked.length, earn: [50, 200, 500, 1000, 2000].map(t => ({ t, pct: pct(all.filter(s => has(s, "earn_" + t)).length, earnBase) })), earnBase,
-    spendPct: pct(all.filter(s => has(s, "spend_1")).length, all.length), shopOpened: shop.length, shopNoBuy: shop.filter(s => !bought(s)).length,
+
+  const ecoBase = since(n => n.startsWith("earn_") || n.startsWith("spend_"));
+  const earnBase = ecoBase.length;
+  const economy = { sessions: all.length, measured: tracked.length, base: ecoBase.length, earn: [50, 200, 500, 1000, 2000].map(t => ({ t, pct: pct(all.filter(s => has(s, "earn_" + t)).length, earnBase) })), earnBase,
+    spendPct: pct(all.filter(s => has(s, "spend_1")).length, ecoBase.length), shopOpened: shop.length, shopNoBuy: shop.filter(s => !bought(s)).length,
     shopNoBuyPct: pct(shop.filter(s => !bought(s)).length, shop.length), refused: all.filter(s => has(s, "buy_refused")).length,
     wheel: all.filter(s => has(s, "wheel_spin")).length, buys: Object.entries(buys).map(([skin, n]) => ({ skin, n })).sort((a, b) => b.n - a.n) };
 
   // social : ami sur le serveur, chat ; l'effet d'un ami sur la durée et la manche jouée
   const grp = a => { const d = a.filter(s => !s.live && Number.isFinite(s.dur)); return { n: a.length, medianSec: med(d.map(s => s.dur)), playPct: pct(a.filter(s => has(s, "play")).length, a.length) } };
-  const social = { sessions: all.length, friendPct: pct(all.filter(s => has(s, "with_friend")).length, all.length), chatPct: pct(all.filter(s => has(s, "chat")).length, all.length),
-    withFriend: grp(all.filter(s => has(s, "with_friend"))), alone: grp(all.filter(s => !has(s, "with_friend"))) };
+  const socBase = since(n => n === "with_friend" || n === "chat" || n.startsWith("earn_"));
+  const social = { sessions: socBase.length, friendPct: pct(socBase.filter(s => has(s, "with_friend")).length, socBase.length), chatPct: pct(socBase.filter(s => has(s, "chat")).length, socBase.length),
+    withFriend: grp(socBase.filter(s => has(s, "with_friend"))), alone: grp(socBase.filter(s => !has(s, "with_friend"))) };
 
   // appareils : type d'appareil (événement client), FPS client, chargement, durée, manche ; les petits écrans à part
   const G = {};

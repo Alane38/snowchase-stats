@@ -24,7 +24,13 @@ export default async function handler(req, res) {
     else if (e.type === "purchase" && e.ok) { const o = open[k]; if (o) o.buys++ }
     if (e.job) { const s = srv[e.job] || (srv[e.job] = { job: e.job.slice(0, 8), t0: e.t, t1: e.t, peak: 0, joins: 0, v: e.v }); s.t0 = Math.min(s.t0, e.t); s.t1 = Math.max(s.t1, e.t); if (e.type === "join") s.joins++; if (Number.isFinite(e.n)) s.peak = Math.max(s.peak, e.n); if (e.type === "server_end") { s.ended = true; if (e.peak) s.peak = Math.max(s.peak, e.peak) } } });
   Object.values(bt).forEach(b => { if (!b.job) return; const s = srv[b.job] || (srv[b.job] = { job: b.job.slice(0, 8), t0: b.t - (b.up || 0), t1: b.t, peak: 0, joins: 0, v: b.v }); s.t1 = Math.max(s.t1, b.t); if (Number.isFinite(b.n)) s.peak = Math.max(s.peak, b.n) });
-  Object.values(open).forEach(o => sess.push({ ...o, live: true }));
+  // une entrée sans sortie : en cours si son serveur bat encore (battement de moins de 5 min), sinon sa sortie s'est
+  // perdue (serveur arrêté avant d'envoyer, journée hors fenêtre) : close à la dernière activité du serveur, durée
+  // estimée (est). Avant, ces sessions restaient « en cours » pour toujours et faussaient les pourcentages
+  const nowS = Math.floor(Date.now() / 1000);
+  Object.values(open).forEach(o => { const b = bt[o.jf], s = srv[o.jf];
+    if (b && nowS - b.t < 300) sess.push({ ...o, live: true });
+    else { const end = Math.max(o.t, s ? s.t1 : o.t, b ? b.t : o.t); sess.push({ ...o, dur: end - o.t, end, est: true }) } });
   const done = sess.filter(s => Number.isFinite(s.dur)), durs = done.map(s => s.dur);
   const tracked = done.filter(s => s.ph && Object.keys(s.ph).length), withPlay = done.filter(s => Number.isFinite(s.ph && s.ph.play)), playDurs = withPlay.map(s => Math.max(0, s.dur - s.ph.play)), loads = sess.map(s => s.ph && s.ph.loaded).filter(Number.isFinite);
   // phases de la dernière version publiée (le suivi du tutoriel, du lobby et des manches en dépend) : combien de sessions
