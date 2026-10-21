@@ -25,7 +25,7 @@ jobs:
           D=$(date -u +%Y-%m-%dT%H-%M)
           curl -sS -f --max-time 60 "https://snowchase-stats.vercel.app/api/public?x=$(date +%s)" -o /tmp/public.json || echo "{}" > /tmp/public.json
           ok=0
-          for i in 0 1 2 3 4 5 6 7 8 9 10 11 12; do
+          for i in 0 1 2 3 4 5 6 7 8 9 10 11 12 13; do
             got=0
             for a in 1 2; do
               if curl -sS -f --max-time 90 -H "Authorization: Bearer $CRON_SECRET" "https://snowchase-stats.vercel.app/api/snapshot?p=$i&x=$(date +%s)" -o /tmp/out/p$i.txt; then got=1; break; fi
@@ -34,9 +34,9 @@ jobs:
             if [ "$got" = 1 ]; then ok=$((ok+1)); else echo "partie $i : echec apres 2 essais" > /tmp/out/p$i.txt; fi
             sleep 20
           done
-          echo "parties recues : $ok/13"
+          echo "parties recues : $ok/14"
           if [ "$ok" -eq 0 ]; then echo "Aucune partie recue, rien a archiver"; exit 1; fi
-          for i in 0 1 2 3 4 5 6 7 8 9 10 11 12; do cat /tmp/out/p$i.txt; echo; done > /tmp/snap.txt
+          for i in 0 1 2 3 4 5 6 7 8 9 10 11 12 13; do cat /tmp/out/p$i.txt; echo; done > /tmp/snap.txt
           git config user.name "snowchase-bot"
           git config user.email "snowchase-bot@users.noreply.github.com"
           if git fetch origin data; then git checkout -B data origin/data; else git checkout --orphan data; git rm -rf . > /dev/null; fi
@@ -46,13 +46,13 @@ jobs:
           cp /tmp/snap.txt releves/latest.txt
           cp /tmp/public.json releves/latest-public.json
           git add releves
-          git commit -m "relevé $D ($ok/13 parties)"
+          git commit -m "relevé $D ($ok/14 parties)"
           for a in 1 2 3; do
             git push origin data && break
             git fetch origin data
             git rebase origin/data
           done
-          [ "$ok" -ge 10 ] || { echo "Relevé incomplet ($ok/13) : archivé mais marqué en échec"; exit 1; }
+          [ "$ok" -ge 11 ] || { echo "Relevé incomplet ($ok/14) : archivé mais marqué en échec"; exit 1; }
       - name: Export quotidien des sessions (anonymisé)
         if: always()
         env:
