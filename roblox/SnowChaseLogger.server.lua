@@ -191,7 +191,9 @@ task.spawn(function()
 	end
 end)
 
+local closing = false -- arrêt du serveur : les sorties sont déjà poussées par BindToClose
 Players.PlayerRemoving:Connect(function(p)
+	if closing then return end
 	local t0 = joined[p]; joined[p] = nil; joinedC[p] = nil; alive[p] = nil; seenClient[p] = nil; lastAct[p] = nil; cur[p] = nil; once[p] = nil
 	push({ type = "leave", uid = p.UserId, name = p.Name, n = #Players:GetPlayers(),
 		dur = t0 and (os.time() - t0) or nil })
@@ -242,6 +244,12 @@ end)
 
 task.spawn(function() while true do task.wait(FLUSH_EVERY); flush() end end)
 game:BindToClose(function()
+	-- les joueurs encore là à l'arrêt : leur sortie, sinon leur session restait sans fin (audit des données, 21/10)
+	closing = true
+	for _, p in ipairs(Players:GetPlayers()) do
+		local t0 = joined[p]
+		push({ type = "leave", uid = p.UserId, name = p.Name, n = 0, dur = t0 and (os.time() - t0) or nil })
+	end
 	push({ type = "server_end", n = #Players:GetPlayers(), up = os.time() - started, peak = peak })
 	flush()
 end)
