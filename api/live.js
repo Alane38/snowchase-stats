@@ -30,9 +30,13 @@ export default async function handler(req, res) {
   // phases de la dernière version publiée (le suivi du tutoriel, du lobby et des manches en dépend) : combien de sessions
   // atteignent chaque phase, en combien de secondes, et la dernière phase vue avant de quitter
   const vOf = s => srv[Object.keys(srv).find(j => j.startsWith(s.job))]?.v, latest = Math.max(0, ...Object.values(srv).map(s => s.v || 0));
-  const lv = sess.filter(s => vOf(s) === latest), PH = {};
+  // la dernière version, et les précédentes tant qu'il y a moins de PH_MIN sessions (une version neuve à 1 joueur
+  // affichait 100 % partout, Alane 21/10)
+  const PH_MIN = 30, byV = {}; sess.forEach(s => { const v = vOf(s); if (v) (byV[v] = byV[v] || []).push(s) });
+  const vs = []; let lv = []; Object.keys(byV).map(Number).sort((a, b) => b - a).forEach(v => { if (lv.length < PH_MIN) { vs.push(v); lv = lv.concat(byV[v]) } });
+  const PH = {};
   lv.forEach(s => Object.entries(s.ph || {}).forEach(([n, dt]) => (PH[n] = PH[n] || []).push(dt)));
-  const phases = { v: latest || null, sessions: lv.length, steps: Object.entries(PH).map(([name, a]) => ({ name, n: a.length, medDt: med(a.map(x => Math.round(x))) })).sort((a, b) => b.n - a.n),
+  const phases = { v: latest || null, vFrom: vs.length ? Math.min(...vs) : null, sessions: lv.length, steps: Object.entries(PH).map(([name, a]) => ({ name, n: a.length, medDt: med(a.map(x => Math.round(x))) })).sort((a, b) => b.n - a.n),
     leftAfter: Object.entries(lv.filter(s => !s.live && s.last).reduce((o, s) => (o[s.last] = (o[s.last] || 0) + 1, o), {})).map(([name, n]) => ({ name, n })).sort((a, b) => b.n - a.n) };
   // versions publiées : comparer chaque publication à la précédente (durée, manche jouée, sessions longues)
   const versions = Object.entries(sess.reduce((o, s) => { const v = vOf(s); if (v) (o[v] = o[v] || []).push(s); return o }, {})).map(([v, a]) => { const d = a.filter(s => Number.isFinite(s.dur)); return { v: +v, sessions: a.length, t0: Math.min(...a.map(s => s.t)), medianSec: med(d.map(s => s.dur)), playPct: Math.round(a.filter(s => s.ph && s.ph.play != null).length / a.length * 100), over5Pct: d.length ? Math.round(d.filter(s => s.dur >= 300).length / d.length * 100) : null } }).sort((a, b) => b.v - a.v);
