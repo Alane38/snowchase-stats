@@ -30,6 +30,7 @@ export default async function handler(req, res) {
   const devices = cnt(ev.filter(e => e.type === "client"), e => e.dev);
   res.setHeader("cache-control", "s-maxage=120, stale-while-revalidate=300");
   res.status(200).json({ at: new Date().toISOString(), days,
+    fresh: { event: ev.length ? ev[ev.length - 1].t : null, sample: samples.length ? samples[samples.length - 1].t : null, beat: Object.values(bt).reduce((m, b) => Math.max(m, b.t || 0), 0) || null },
     totals: { sessions: sess.length, players: new Set(ev.filter(e => e.type === "join").map(e => e.p)).size, medianSec: med(durs), medianPlaySec: med(playDurs), medianLoadSec: loads.length ? +(med(loads.map(x => Math.round(x * 10))) / 10).toFixed(1) : null, leftBeforePlay: tracked.length && withPlay.length ? +((tracked.filter(s => !Number.isFinite(s.ph.play)).length) / tracked.length * 100).toFixed(1) : null, neverMoved: tracked.length ? +(tracked.filter(s => s.ph.move == null).length / tracked.length * 100).toFixed(1) : null, bounce: done.length ? +(done.filter(s => s.dur < 30).length / done.length * 100).toFixed(1) : null,
       premium: sess.length ? +(sess.filter(s => s.prem).length / sess.length * 100).toFixed(1) : null, newAccounts: sess.length ? +(sess.filter(s => Number.isFinite(s.acct) && s.acct < 30).length / sess.length * 100).toFixed(1) : null, deaths: ev.filter(e => e.type === "death").length, purchases: ev.filter(e => e.type === "purchase" && e.ok).length },
     flow, servers: Object.values(srv).sort((a, b) => b.t0 - a.t0).slice(0, 50).map(s => ({ ...s, lifeSec: s.t1 - s.t0 })),
