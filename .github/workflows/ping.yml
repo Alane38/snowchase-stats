@@ -15,15 +15,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Relevé complet puis archivage sur la branche data
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
         run: |
           mkdir -p /tmp/out
+          if [ -z "$CRON_SECRET" ]; then echo "Secret GitHub CRON_SECRET absent : Settings > Secrets and variables > Actions, même valeur que sur Vercel"; exit 1; fi
+          code=$(curl -s -o /dev/null -w "%{http_code}" -H "Authorization: Bearer $CRON_SECRET" "https://snowchase-stats.vercel.app/api/snapshot?p=99")
+          if [ "$code" = 401 ]; then echo "Refusé (401) : le secret CRON_SECRET de GitHub n'a pas la même valeur que celui de Vercel"; exit 1; fi
           D=$(date -u +%Y-%m-%dT%H-%M)
           curl -sS -f --max-time 60 "https://snowchase-stats.vercel.app/api/public?x=$(date +%s)" -o /tmp/public.json || echo "{}" > /tmp/public.json
           ok=0
           for i in 0 1 2 3 4 5 6 7 8 9 10 11 12; do
             got=0
             for a in 1 2; do
-              if curl -sS -f --max-time 90 "https://snowchase-stats.vercel.app/api/snapshot?p=$i&x=$(date +%s)" -o /tmp/out/p$i.txt; then got=1; break; fi
+              if curl -sS -f --max-time 90 -H "Authorization: Bearer $CRON_SECRET" "https://snowchase-stats.vercel.app/api/snapshot?p=$i&x=$(date +%s)" -o /tmp/out/p$i.txt; then got=1; break; fi
               sleep 20
             done
             if [ "$got" = 1 ]; then ok=$((ok+1)); else echo "partie $i : echec apres 2 essais" > /tmp/out/p$i.txt; fi
