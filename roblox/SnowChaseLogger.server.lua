@@ -159,38 +159,37 @@ local function onAdded(p)
 	end)
 end
 
--- État du jeu : lecture seule, jamais bloquant (pcall). Une phase "une seule fois" par joueur et par serveur.
-local okState, GameState = pcall(function() return require(ServerScriptService.SnowChase.Core.State) end)
-if okState and type(GameState) == "table" and GameState.match then
-	task.spawn(function()
-		while true do
-			task.wait(1)
-			local ok = pcall(function()
-				local alone = #GameState.activePlayers() < GameState.playersNeeded()
-				for _, p in ipairs(Players:GetPlayers()) do
-					if joinedC[p] then
-						local label
-						if GameState.match.participants and GameState.match.participants[p] then label = "play"
-						elseif p:GetAttribute("InTutorial") == true or p:GetAttribute("TutorialLobby") == true then label = "tuto"
-						elseif p:GetAttribute("ProfileLoaded") ~= true then label = "loading"
-						elseif alone then label = "alone"
-						else label = "lobby" end
-						if label ~= "loading" then
-							local first = not (once[p] and once[p][label])
-							phase(p, label, nil, true)
-							if first and label == "play" then flushSoon() end
-						end
-						if p:GetAttribute("SnowChasePhase") == nil then cur[p] = label end
-					end
-				end
-			end)
-			if not ok then task.wait(4) end
-		end
-	end)
-end
-
 Players.PlayerAdded:Connect(onAdded)
 for _, p in ipairs(Players:GetPlayers()) do task.spawn(onAdded, p) end
+
+-- État du jeu : lecture seule, jamais bloquant (task.spawn + pcall). Une phase "une seule fois" par joueur et par serveur.
+task.spawn(function()
+	local okState, GameState = pcall(function() return require(ServerScriptService.SnowChase.Core.State) end)
+	if not (okState and type(GameState) == "table" and GameState.match) then return end
+	while true do
+		task.wait(1)
+		local ok = pcall(function()
+			local alone = #GameState.activePlayers() < GameState.playersNeeded()
+			for _, p in ipairs(Players:GetPlayers()) do
+				if joinedC[p] then
+					local label
+					if GameState.match.participants and GameState.match.participants[p] then label = "play"
+					elseif p:GetAttribute("InTutorial") == true or p:GetAttribute("TutorialLobby") == true then label = "tuto"
+					elseif p:GetAttribute("ProfileLoaded") ~= true then label = "loading"
+					elseif alone then label = "alone"
+					else label = "lobby" end
+					if label ~= "loading" then
+						local first = not (once[p] and once[p][label])
+						phase(p, label, nil, true)
+						if first and label == "play" then flushSoon() end
+					end
+					if p:GetAttribute("SnowChasePhase") == nil then cur[p] = label end
+				end
+			end
+		end)
+		if not ok then task.wait(4) end
+	end
+end)
 
 Players.PlayerRemoving:Connect(function(p)
 	local t0 = joined[p]; joined[p] = nil; joinedC[p] = nil; alive[p] = nil; seenClient[p] = nil; lastAct[p] = nil; cur[p] = nil; once[p] = nil
