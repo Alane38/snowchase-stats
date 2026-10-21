@@ -12,7 +12,17 @@ export async function pipe(cmds) {
 export const cmd = async (...a) => (await pipe([a]))[0];
 export const day = (off = 0) => new Date(Date.now() - off * 864e5).toISOString().slice(0, 10);
 const parse = a => (a || []).map(s => { try { return JSON.parse(s) } catch { return null } }).filter(Boolean);
-export const readEvents = async days => (await pipe(days.map(d => ["LRANGE", "ev:" + d, "-4000", "-1"]))).flatMap(parse);
+// toute la journée, par paquets de 3 000 (une réponse par appel reste sous la taille maximale d'Upstash) ; avant, seuls les
+// 4 000 derniers événements étaient lus et le matin d'une journée chargée manquait à l'archive et aux vues
+const PAGE = 3000, MAX_DAY = 60000;
+export async function readEvents(days) {
+  const lens = await pipe(days.map(d => ["LLEN", "ev:" + d])), out = [];
+  for (const [i, d] of days.entries()) {
+    const n = Math.min(lens[i] || 0, MAX_DAY);
+    for (let from = (lens[i] || 0) - n; from < lens[i]; from += PAGE) out.push(...parse((await pipe([["LRANGE", "ev:" + d, String(from), String(from + PAGE - 1)]]))[0]));
+  }
+  return out;
+}
 export const readPos = async days => (await pipe(days.map(d => ["LRANGE", "ps:" + d, "-1500", "-1"]))).flatMap(parse);
 export const readSamples = async days => (await pipe(days.map(d => ["LRANGE", "sm:" + d, "-1500", "-1"]))).flatMap(parse);
 export async function readBeats() {
