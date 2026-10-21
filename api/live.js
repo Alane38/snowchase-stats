@@ -16,9 +16,9 @@ export default async function handler(req, res) {
   const open = {}, sess = [], dev = {}, srv = {};
   ev.forEach(e => { const k = e.job + "|" + e.p;
     if (e.type === "client") dev[k] = e;
-    if (e.type === "join") open[k] = { p: e.p && e.p.slice(0, 6), job: e.job && e.job.slice(0, 8), t: e.t, reg: e.reg, acct: e.acct, prem: e.prem, src: e.src, dur: null, deaths: 0, buys: 0, ph: {} };
+    if (e.type === "join") open[k] = { p: e.p && e.p.slice(0, 6), job: e.job && e.job.slice(0, 8), jf: e.job, uid: e.uid, t: e.t, reg: e.reg, acct: e.acct, prem: e.prem, src: e.src, dur: null, deaths: 0, buys: 0, ph: {}, seq: [] };
     else if (e.type === "leave") { const o = open[k] || { p: e.p && e.p.slice(0, 6), job: e.job && e.job.slice(0, 8), t: e.t - (e.dur || 0), deaths: 0, buys: 0, ph: {} }; o.dur = e.dur; o.end = e.t; sess.push(o); delete open[k] }
-    else if (e.type === "phase" && open[k] && e.ph && Number.isFinite(e.dt)) { if (open[k].ph[e.ph] == null) open[k].ph[e.ph] = e.dt; open[k].last = e.ph }
+    else if (e.type === "phase" && open[k] && e.ph && Number.isFinite(e.dt)) { if (open[k].ph[e.ph] == null) open[k].ph[e.ph] = e.dt; open[k].last = e.ph; if (open[k].seq.length < 60) open[k].seq.push({ ph: e.ph, dt: e.dt }) }
     else if (e.type === "death" && open[k]) open[k].deaths++;
     else if (e.type === "purchase" && e.ok) { const o = open[k]; if (o) o.buys++ }
     if (e.job) { const s = srv[e.job] || (srv[e.job] = { job: e.job.slice(0, 8), t0: e.t, t1: e.t, peak: 0, joins: 0, v: e.v }); s.t0 = Math.min(s.t0, e.t); s.t1 = Math.max(s.t1, e.t); if (e.type === "join") s.joins++; if (Number.isFinite(e.n)) s.peak = Math.max(s.peak, e.n); if (e.type === "server_end" && e.peak) s.peak = Math.max(s.peak, e.peak) } });
@@ -33,6 +33,16 @@ export default async function handler(req, res) {
   lv.forEach(s => Object.entries(s.ph || {}).forEach(([n, dt]) => (PH[n] = PH[n] || []).push(dt)));
   const phases = { v: latest || null, sessions: lv.length, steps: Object.entries(PH).map(([name, a]) => ({ name, n: a.length, medDt: med(a.map(x => Math.round(x))) })).sort((a, b) => b.n - a.n),
     leftAfter: Object.entries(lv.filter(s => !s.live && s.last).reduce((o, s) => (o[s.last] = (o[s.last] || 0) + 1, o), {})).map(([name, n]) => ({ name, n })).sort((a, b) => b.n - a.n) };
+  // versions publiées : comparer chaque publication à la précédente (durée, manche jouée, sessions longues)
+  const versions = Object.entries(sess.reduce((o, s) => { const v = vOf(s); if (v) (o[v] = o[v] || []).push(s); return o }, {})).map(([v, a]) => { const d = a.filter(s => Number.isFinite(s.dur)); return { v: +v, sessions: a.length, t0: Math.min(...a.map(s => s.t)), medianSec: med(d.map(s => s.dur)), playPct: Math.round(a.filter(s => s.ph && s.ph.play != null).length / a.length * 100), over5Pct: d.length ? Math.round(d.filter(s => s.dur >= 300).length / d.length * 100) : null } }).sort((a, b) => b.v - a.v);
+  // matchmaking : relevés du jour où au moins 2 serveurs publics n'avaient qu'1 joueur (Roblox a séparé des joueurs seuls)
+  const today = samples.filter(x => x.t >= Date.parse(days[1] + "T00:00:00Z") / 1000), splitS = today.filter(x => x.s.filter(y => y.n === 1).length >= 2);
+  const split = { samples: today.length, splitSamples: splitS.length, lastAt: splitS.length ? splitS[splitS.length - 1].t : null, maxAlone: Math.max(0, ...today.map(x => x.s.filter(y => y.n === 1).length)) };
+  // joueurs en ligne, ANONYMES : code haché court, état, appareil, pays, tranche d'âge du compte, chronologie. Jamais de
+  // pseudo, d'identifiant, d'avatar ni de position
+  const now = Math.floor(Date.now() / 1000), acctB = a => !Number.isFinite(a) ? null : a < 30 ? "<30 j" : a < 365 ? "30-365 j" : a < 1095 ? "1-3 ans" : "3 ans+";
+  const online = Object.entries(open).filter(([, o]) => { const b = bt[o.jf]; return b && now - b.t < 180 }).map(([k, o]) => { const b = bt[o.jf], pl = b.pl && b.pl[o.uid] || {}, c = dev[k] || {};
+    return { p: o.p, v: b.v, state: pl.ph || o.last || null, idle: pl.idle ?? null, dev: c.dev || null, inp: c.inp || null, reg: o.reg || null, acct: acctB(o.acct), sec: now - o.t, seq: o.seq } }).sort((a, b) => a.sec - b.sec);
   const cnt = (a, f) => { const o = {}; a.forEach(x => { const k = f(x) || "inconnu"; o[k] = (o[k] || 0) + 1 }); return Object.entries(o).map(([name, n]) => ({ name, n })).sort((a, b) => b.n - a.n) };
   const devices = cnt(ev.filter(e => e.type === "client"), e => e.dev);
   res.setHeader("cache-control", "s-maxage=120, stale-while-revalidate=300");
@@ -42,5 +52,5 @@ export default async function handler(req, res) {
       premium: sess.length ? +(sess.filter(s => s.prem).length / sess.length * 100).toFixed(1) : null, newAccounts: sess.length ? +(sess.filter(s => Number.isFinite(s.acct) && s.acct < 30).length / sess.length * 100).toFixed(1) : null, deaths: ev.filter(e => e.type === "death").length, purchases: ev.filter(e => e.type === "purchase" && e.ok).length },
     flow, servers: Object.values(srv).sort((a, b) => b.t0 - a.t0).slice(0, 50).map(s => ({ ...s, lifeSec: s.t1 - s.t0 })),
     sessions: sess.sort((a, b) => b.t - a.t).slice(0, 100).map(s => ({ p: s.p, job: s.job, t: s.t, dur: s.dur, reg: s.reg, acct: s.acct, prem: !!s.prem, src: s.src, deaths: s.deaths, live: !!s.live, load: s.ph && s.ph.loaded != null ? s.ph.loaded : null, spawn: s.ph && s.ph.spawn != null ? s.ph.spawn : null, move: s.ph && s.ph.move != null ? s.ph.move : null, play: s.ph && s.ph.play != null ? s.ph.play : null })),
-    phases, regions: cnt(sess, s => s.reg), devices, sources: cnt(sess, s => s.src) });
+    phases, versions, split, online, regions: cnt(sess, s => s.reg), devices, sources: cnt(sess, s => s.src) });
 }

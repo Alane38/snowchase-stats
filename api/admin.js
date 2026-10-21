@@ -38,7 +38,7 @@ async function live(req, res) {
     if (e.type === "server_end") delete last[e.job];
     if (e.type === "join") { open[k] = { uid: e.uid, name: e.name, dn: e.dn, job: e.job, v: e.v, since: e.t, reg: e.reg, acct: e.acct, prem: e.prem, src: e.src, deaths: 0, phs: [] }; const w = who[e.uid] || (who[e.uid] = { uid: e.uid, name: e.name, dn: e.dn, visits: 0, sec: 0, first: e.t, last: e.t, deaths: 0, buys: 0 }); w.visits++; w.first = Math.min(w.first, e.t); w.last = Math.max(w.last, e.t); w.name = e.name; w.dn = e.dn || w.dn }
     else if (e.type === "leave") { const o = open[k]; const w = who[e.uid]; if (w && Number.isFinite(e.dur)) { w.sec += e.dur; w.last = Math.max(w.last, e.t) } sessions.push({ uid: e.uid, name: e.name, job: (e.job || "").slice(0, 8), t: e.t - (e.dur || 0), dur: e.dur, deaths: o ? o.deaths : 0, reg: o && o.reg, acct: o && o.acct, prem: o && o.prem, src: o && o.src, phs: o ? o.phs : [] }); delete open[k] }
-    else if (e.type === "phase") { if (open[k] && open[k].phs.length < 30) open[k].phs.push({ ph: e.ph, dt: e.dt }) }
+    else if (e.type === "phase") { if (open[k] && open[k].phs.length < 60) open[k].phs.push({ ph: e.ph, dt: e.dt }) }
     else if (e.type === "death") { if (open[k]) open[k].deaths++; if (who[e.uid]) who[e.uid].deaths++ }
     else if (e.type === "purchase" && e.ok && who[e.uid]) who[e.uid].buys++ });
   Object.values(bt).forEach(b => { if (b.job) last[b.job] = Math.max(last[b.job] || 0, b.t) });
