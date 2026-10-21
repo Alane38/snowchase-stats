@@ -1,6 +1,6 @@
 // Agrégats PUBLICS depuis le lancement de la campagne : 8 derniers jours lus dans Redis, jours plus anciens relus dans l'archive anonymisée (branche data) : carte des heures de pointe, parcours de session (entonnoir),
 // joueurs depuis le lancement de la campagne. Aucun pseudo ni identifiant. Cache CDN 15 min (environ 20 commandes Redis par recalcul).
-import { ready, readEvents, readSamples, day } from "./_db.js";
+import { ready, readEvents, readSamples, readPos, day } from "./_db.js";
 const CAMP = Date.parse("2026-10-19T19:30:00Z") / 1000; // lancement de la campagne : 19/10/2026 21h30 à Paris
 const F = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Paris", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", hourCycle: "h23" });
 const paris = t => { const o = {}; F.formatToParts(new Date(t * 1000)).forEach(p => o[p.type] = p.value); return { d: o.year + "-" + o.month + "-" + o.day, h: +o.hour } };
@@ -8,10 +8,10 @@ export default async function handler(req, res) {
   if (!ready()) return res.status(503).json({ error: "base non configurée" });
   const ds = Array.from({ length: 8 }, (_, i) => day(i));
   const older = []; for (let i = 8; i < 60; i++) { const d = day(i); if (d < new Date(CAMP * 1000).toISOString().slice(0, 10)) break; older.push(d) }
-  let ev, sm;
-  try { [ev, sm] = await Promise.all([readEvents(ds), readSamples(ds)]) } catch { return res.status(502).json({ error: "base indisponible" }) }
+  let ev, sm, ps;
+  try { [ev, sm, ps] = await Promise.all([readEvents(ds), readSamples(ds), readPos(ds)]) } catch { return res.status(502).json({ error: "base indisponible" }) }
   const arch = await Promise.all(older.map(async d => { try { const r = await fetch("https://raw.githubusercontent.com/Alane38/snowchase-stats/data/sessions/" + d + ".json"); return r.ok ? await r.json() : null } catch { return null } }));
-  arch.forEach(a => { if (a && Array.isArray(a.events)) { ev = ev.concat(a.events); sm = sm.concat(Array.isArray(a.samples) ? a.samples : []) } });
+  arch.forEach(a => { if (a && Array.isArray(a.events)) { ev = ev.concat(a.events); sm = sm.concat(Array.isArray(a.samples) ? a.samples : []); if (Array.isArray(a.pos)) ps = ps.concat(a.pos) } });
   ev = ev.filter(e => e.job).sort((a, b) => a.t - b.t);
   // heures de pointe : moyenne des joueurs en ligne par (jour, heure) à Paris
   const H = {};
@@ -29,7 +29,12 @@ export default async function handler(req, res) {
   const funnel = { sessions: tracked.length, loaded: n(s => s.ph.loaded != null), spawn: n(s => s.ph.spawn != null), move: n(s => s.ph.move != null), play: n(s => s.ph.play != null), alone: n(s => s.ph.alone != null), tuto: n(s => s.ph.tuto != null), stay30: n(s => Number.isFinite(s.dur) && s.dur >= 30) };
   const since = sess.filter(s => s.t >= CAMP), uniq = a => new Set(a.map(s => s.p).filter(Boolean)).size;
   const firstT = ev.length ? ev[0].t : null;
+  // cartes de positions : cases de 20 studs, séparées en manche / hors manche (le tutoriel est exclu : autre zone)
+  const P = [{}, {}];
+  ps.forEach(x => (x.c || []).forEach(q => { const g = q[2] === 1 ? 1 : q[2] === 0 ? 0 : -1; if (g < 0) return; const k = q[0] + "," + q[1]; P[g][k] = (P[g][k] || 0) + 1 }));
+  const top = o => Object.entries(o).sort((a, b) => b[1] - a[1]).slice(0, 600).map(([k, n]) => { const [x, z] = k.split(",").map(Number); return [x, z, n] });
+  const pos = { lobby: top(P[0]), play: top(P[1]), snaps: ps.length };
   res.setHeader("cache-control", "s-maxage=900, stale-while-revalidate=1800");
-  res.status(200).json({ at: new Date().toISOString(), campStart: CAMP, from: firstT, heat, funnel,
+  res.status(200).json({ at: new Date().toISOString(), campStart: CAMP, from: firstT, heat, funnel, pos,
     campaign: { sessions: since.length, players: uniq(since), played: uniq(since.filter(s => s.ph.play != null)), complete: firstT != null && firstT <= CAMP + 3600 } });
 }

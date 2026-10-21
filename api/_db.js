@@ -13,6 +13,7 @@ export const cmd = async (...a) => (await pipe([a]))[0];
 export const day = (off = 0) => new Date(Date.now() - off * 864e5).toISOString().slice(0, 10);
 const parse = a => (a || []).map(s => { try { return JSON.parse(s) } catch { return null } }).filter(Boolean);
 export const readEvents = async days => (await pipe(days.map(d => ["LRANGE", "ev:" + d, "-4000", "-1"]))).flatMap(parse);
+export const readPos = async days => (await pipe(days.map(d => ["LRANGE", "ps:" + d, "-1500", "-1"]))).flatMap(parse);
 export const readSamples = async days => (await pipe(days.map(d => ["LRANGE", "sm:" + d, "-1500", "-1"]))).flatMap(parse);
 export async function readBeats() {
   const k = await cmd("KEYS", "beat:*"); if (!k.length) return {};

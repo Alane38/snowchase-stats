@@ -1,6 +1,6 @@
 // Export ANONYMISÉ d'une journée pour l'archive publique (branche data). Protégé par Authorization: Bearer CRON_SECRET.
 // Jamais de pseudo, d'identifiant, de nom affiché ni de position : seulement le code haché du joueur, des durées et des tranches.
-import { ready, readEvents, readSamples } from "./_db.js";
+import { ready, readEvents, readSamples, readPos } from "./_db.js";
 const acct = a => !Number.isFinite(a) ? null : a < 30 ? "<30j" : a < 365 ? "30-365j" : a < 1095 ? "1-3 ans" : "3 ans+";
 const keep = e => {
   const o = { t: e.t, type: e.type, job: e.job, v: e.v, n: e.n, p: e.p ? e.p.slice(0, 12) : undefined };
@@ -18,9 +18,9 @@ export default async function handler(req, res) {
   if (!ready()) return res.status(503).json({ error: "base non configurée" });
   const d = /^\d{4}-\d{2}-\d{2}$/.test(req.query.day || "") ? req.query.day : null;
   if (!d) return res.status(400).json({ error: "day=AAAA-MM-JJ requis" });
-  let ev, sm;
-  try { [ev, sm] = await Promise.all([readEvents([d]), readSamples([d])]) } catch { return res.status(502).json({ error: "base indisponible" }) }
+  let ev, sm, ps;
+  try { [ev, sm, ps] = await Promise.all([readEvents([d]), readSamples([d]), readPos([d])]) } catch { return res.status(502).json({ error: "base indisponible" }) }
   ev.sort((a, b) => a.t - b.t);
   res.setHeader("cache-control", "no-store");
-  res.status(200).json({ day: d, note: "anonymisé : pas de pseudo, d'identifiant, de position", events: ev.filter(e => e.type !== "beat").map(keep), samples: sm });
+  res.status(200).json({ day: d, note: "anonymisé : pas de pseudo, d'identifiant ; positions en cases de 20 studs sans identifiant", events: ev.filter(e => e.type !== "beat").map(keep), samples: sm, pos: ps });
 }

@@ -10,7 +10,7 @@ export default async function handler(req, res) {
   if (!r || !r.ok) return res.status(502).json({ error: r ? r.status : "réseau" });
   const j = await r.json(), t = Date.now(), s = (j.data || []).map(x => ({ id: x.id, n: x.playing, max: x.maxPlayers, fps: x.fps && +x.fps.toFixed(1), ping: x.ping }));
   const cmds = [["RPUSH", "sm:" + day(), JSON.stringify({ t: Math.floor(t / 1000), s })]], dt = new Date(t);
-  if (dt.getUTCHours() === 3 && dt.getUTCMinutes() < 2) for (let i = 8; i <= 14; i++) cmds.push(["DEL", "ev:" + day(i)], ["DEL", "sm:" + day(i)]);
+  if (dt.getUTCHours() === 3 && dt.getUTCMinutes() < 2) for (let i = 8; i <= 14; i++) cmds.push(["DEL", "ev:" + day(i)], ["DEL", "sm:" + day(i)], ["DEL", "ps:" + day(i)]);
   const rows = (await pipe(cmds))[0];
   res.status(200).json({ servers: s.length, players: s.reduce((a, x) => a + x.n, 0), samplesToday: rows });
 }

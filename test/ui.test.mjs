@@ -14,7 +14,8 @@ const ads = fs.readFileSync(new URL("test/fixtures/ads.csv", root), "utf8");
 
 const now = Math.floor(Date.now() / 1000);
 const flow = Array.from({ length: 60 }, (_, i) => ({ t: Math.floor(now / 600) * 600 - 600 * (59 - i), avg: (i % 4) / 2, peak: 1 + (i % 5), servers: 1 + (i % 2), fps: 58, ping: 90 }));
-const RANGE = { at: "x", heat: [], funnel: { sessions: 40, loaded: 38, spawn: 36, move: 22, play: 8, alone: 14, tuto: 6, stay30: 27 }, campaign: { sessions: 80, players: 61, played: 0, complete: true } };
+const RANGE = { at: "x", heat: [], funnel: { sessions: 40, loaded: 38, spawn: 36, move: 22, play: 8, alone: 14, tuto: 6, stay30: 27 }, campaign: { sessions: 80, players: 61, played: 0, complete: true },
+  pos: { snaps: 42, play: Array.from({ length: 60 }, (_, i) => [(i % 10) - 5, Math.floor(i / 10) - 3, 1 + (i * 7) % 20]), lobby: Array.from({ length: 60 }, (_, i) => [(i % 10) - 5, Math.floor(i / 10) - 3, 1 + (i * 7) % 20]) } };
 const live = (servers, playing) => ({
   pub: { at: "2026-10-21T00:00:00Z", game: { data: [{ name: "Snow Chase", playing, visits: 4211, favoritedCount: 53, maxPlayers: 12, created: "2026-09-21T13:14:14Z", updated: "2026-10-20T09:23:34Z" }] }, votes: { data: [{ upVotes: 32, downVotes: 2 }] }, badges: [{ name: "Welcome", statistics: { awardedCount: 1074, winRatePercentage: 1 } }], servers: { data: servers }, passes: { gamePasses: [{ name: "VIP", price: 299, isForSale: true }] }, icon: { data: [] } },
   live: { at: "x", fresh: { event: now - 30, sample: now - 60, beat: now - 20 }, days: ["a", "b"], totals: { sessions: 23, players: 19, medianSec: 84, bounce: 39.1, premium: 8.7, newAccounts: 30.4, deaths: 41, purchases: 2 }, flow, servers: [], sessions: [], regions: [{ name: "US", n: 15 }], devices: [{ name: "mobile", n: 14 }], sources: [{ name: "direct", n: 20 }] },

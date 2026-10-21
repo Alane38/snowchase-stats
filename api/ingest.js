@@ -31,6 +31,11 @@ export default async function handler(req, res) {
   const cmds = [];
   if (rest.length) cmds.push(["RPUSH", "ev:" + day(), ...rest.map(e => JSON.stringify(e))]);
   Object.values(lastBeat).forEach(b => cmds.push(["SET", "beat:" + b.job, JSON.stringify(b), "EX", "172800"]));
+  // positions : une photo grossière toutes les 2 min et par serveur (cases de 20 studs, sans identifiant) = 1 commande
+  clean.filter(e => e.type === "beat" && e.pl && e.t % 120 < 15).forEach(b => {
+    const c = Object.values(b.pl).filter(d => d && d.x != null && d.z != null).map(d => [Math.floor(d.x / 20), Math.floor(d.z / 20), d.ph === "play" ? 1 : d.ph === "tuto" ? 2 : 0]);
+    if (c.length) cmds.push(["RPUSH", "ps:" + day(), JSON.stringify({ t: b.t, c })]);
+  });
   if (cmds.length) await pipe(cmds);
   res.status(200).json({ stored: clean.length });
 }
