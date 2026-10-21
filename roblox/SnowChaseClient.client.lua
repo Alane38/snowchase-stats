@@ -1,10 +1,23 @@
 -- Snow Chase : infos d'appareil (à placer dans StarterPlayerScripts, LocalScript).
--- Envoie une seule fois au serveur : type d'appareil, taille d'écran, entrée principale, FPS client.
+-- Envoie au serveur : fin de chargement, activité, puis une fois : type d'appareil, taille d'écran, entrée principale, FPS client.
 local UIS = game:GetService("UserInputService")
 local RS = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local remote = ReplicatedStorage:WaitForChild("SnowChaseInfo", 30)
 if not remote then return end
+
+-- le client a fini de charger (le serveur mesure le délai depuis l'entrée du joueur)
+if not game:IsLoaded() then game.Loaded:Wait() end
+remote:FireServer({ k = "loaded" })
+
+-- activité : au plus un message toutes les 5 s, pour détecter les joueurs inactifs
+local lastSent = 0
+local function act()
+	local n = os.clock()
+	if n - lastSent > 5 then lastSent = n; remote:FireServer({ k = "act" }) end
+end
+UIS.InputBegan:Connect(act)
+UIS.InputChanged:Connect(act)
 
 local cam = workspace.CurrentCamera
 task.wait(8) -- laisser la partie se charger avant de mesurer
