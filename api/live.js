@@ -21,7 +21,7 @@ export default async function handler(req, res) {
     else if (e.type === "phase" && open[k] && e.ph && Number.isFinite(e.dt)) { if (open[k].ph[e.ph] == null) open[k].ph[e.ph] = e.dt; open[k].last = e.ph; if (open[k].seq.length < 60) open[k].seq.push({ ph: e.ph, dt: e.dt }) }
     else if (e.type === "death" && open[k]) open[k].deaths++;
     else if (e.type === "purchase" && e.ok) { const o = open[k]; if (o) o.buys++ }
-    if (e.job) { const s = srv[e.job] || (srv[e.job] = { job: e.job.slice(0, 8), t0: e.t, t1: e.t, peak: 0, joins: 0, v: e.v }); s.t0 = Math.min(s.t0, e.t); s.t1 = Math.max(s.t1, e.t); if (e.type === "join") s.joins++; if (Number.isFinite(e.n)) s.peak = Math.max(s.peak, e.n); if (e.type === "server_end" && e.peak) s.peak = Math.max(s.peak, e.peak) } });
+    if (e.job) { const s = srv[e.job] || (srv[e.job] = { job: e.job.slice(0, 8), t0: e.t, t1: e.t, peak: 0, joins: 0, v: e.v }); s.t0 = Math.min(s.t0, e.t); s.t1 = Math.max(s.t1, e.t); if (e.type === "join") s.joins++; if (Number.isFinite(e.n)) s.peak = Math.max(s.peak, e.n); if (e.type === "server_end") { s.ended = true; if (e.peak) s.peak = Math.max(s.peak, e.peak) } } });
   Object.values(bt).forEach(b => { if (!b.job) return; const s = srv[b.job] || (srv[b.job] = { job: b.job.slice(0, 8), t0: b.t - (b.up || 0), t1: b.t, peak: 0, joins: 0, v: b.v }); s.t1 = Math.max(s.t1, b.t); if (Number.isFinite(b.n)) s.peak = Math.max(s.peak, b.n) });
   Object.values(open).forEach(o => sess.push({ ...o, live: true }));
   const done = sess.filter(s => Number.isFinite(s.dur)), durs = done.map(s => s.dur);
