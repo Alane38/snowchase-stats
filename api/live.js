@@ -17,7 +17,7 @@ export default async function handler(req, res) {
   const open = {}, sess = [], dev = {}, srv = {};
   ev.forEach(e => { const k = e.job + "|" + e.p;
     if (e.type === "client") dev[k] = e;
-    if (e.type === "join") open[k] = { k, p: e.p && e.p.slice(0, 6), job: e.job && e.job.slice(0, 8), jf: e.job, uid: e.uid, t: e.t, reg: e.reg, acct: e.acct, prem: e.prem, src: e.src, dur: null, deaths: 0, buys: 0, ph: {}, seq: [] };
+    if (e.type === "join") open[k] = { k, p: e.p && e.p.slice(0, 6), pFull: e.p, job: e.job && e.job.slice(0, 8), jf: e.job, uid: e.uid, t: e.t, reg: e.reg, acct: e.acct, prem: e.prem, src: e.src, dur: null, deaths: 0, buys: 0, ph: {}, seq: [] };
     else if (e.type === "leave") { const o = open[k] || { k, p: e.p && e.p.slice(0, 6), job: e.job && e.job.slice(0, 8), t: e.t - (e.dur || 0), deaths: 0, buys: 0, ph: {}, seq: [] }; o.dur = e.dur; o.end = e.t; sess.push(o); delete open[k] }
     else if (e.type === "phase" && open[k] && e.ph && Number.isFinite(e.dt)) { if (open[k].ph[e.ph] == null) open[k].ph[e.ph] = e.dt; open[k].last = e.ph; if (open[k].seq.length < 60) open[k].seq.push({ ph: e.ph, dt: e.dt }) }
     else if (e.type === "death" && open[k]) open[k].deaths++;
@@ -63,8 +63,11 @@ export default async function handler(req, res) {
   // joueurs en ligne, ANONYMES : code haché court, état, appareil, pays, tranche d'âge du compte, chronologie. Jamais de
   // pseudo, d'identifiant, d'avatar ni de position
   const now = Math.floor(Date.now() / 1000), acctB = a => !Number.isFinite(a) ? null : a < 30 ? "<30 j" : a < 365 ? "30-365 j" : a < 1095 ? "1-3 ans" : "3 ans+";
+  // historique de chaque joueur sur les jours lus (code haché p) : visite n° et temps depuis sa dernière sortie
+  const past = {}; ev.forEach(e => { if (!e.p || (e.type !== "join" && e.type !== "leave")) return; const h = past[e.p] || (past[e.p] = { joins: [], ends: [] }); (e.type === "join" ? h.joins : h.ends).push(e.t) });
+  const histOf = o => { const h = past[o.pFull || o.p]; if (!h) return { visitNo: 1, gapSec: null }; const pe = Math.max(-Infinity, ...h.ends.filter(t => t < o.t)); return { visitNo: h.joins.filter(t => t <= o.t).length || 1, gapSec: Number.isFinite(pe) ? o.t - pe : null } };
   const online = Object.entries(open).filter(([, o]) => { const b = bt[o.jf]; return b && now - b.t < 180 }).map(([k, o]) => { const b = bt[o.jf], pl = b.pl && b.pl[o.uid] || {}, c = dev[k] || {};
-    return { p: o.p, v: b.v, state: pl.ph || o.last || null, idle: pl.idle ?? null, dev: c.dev || null, inp: c.inp || null, reg: o.reg || null, acct: acctB(o.acct), sec: now - o.t, seq: o.seq } }).sort((a, b) => a.sec - b.sec);
+    return { p: o.p, ...histOf(o), v: b.v, state: pl.ph || o.last || null, idle: pl.idle ?? null, dev: c.dev || null, inp: c.inp || null, reg: o.reg || null, acct: acctB(o.acct), sec: now - o.t, seq: o.seq } }).sort((a, b) => a.sec - b.sec);
   const cnt = (a, f) => { const o = {}; a.forEach(x => { const k = f(x) || "inconnu"; o[k] = (o[k] || 0) + 1 }); return Object.entries(o).map(([name, n]) => ({ name, n })).sort((a, b) => b.n - a.n) };
   const devices = cnt(Object.entries(dev).filter(([k]) => !filtered || fk.has(k)).map(([, e]) => e), e => e.dev);
   res.setHeader("cache-control", "s-maxage=20, stale-while-revalidate=60"); // lecture incrémentale : recalculer coûte peu

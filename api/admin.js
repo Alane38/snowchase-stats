@@ -30,8 +30,14 @@ async function heads(ids) {
 }
 async function live(req, res) {
   const days = Math.min(7, Math.max(1, +req.query.days || 2)), ds = Array.from({ length: days }, (_, i) => day(i));
-  const [ev, bt] = await Promise.all([readEvents(ds), readBeats()]);
-  ev.sort((a, b) => a.t - b.t);
+  // 10 jours lus pour l'historique de chaque joueur en ligne (visite n°, temps depuis sa dernière sortie) ; les jours
+  // passés restent en mémoire de l'instance (_db.js), donc ce n'est relu qu'une fois. Le reste n'utilise que `ds`.
+  const HIST = 10, hs = Array.from({ length: HIST }, (_, i) => day(i)), from = Date.parse(ds[ds.length - 1] + "T00:00:00Z") / 1000;
+  const [all, bt] = await Promise.all([readEvents(hs), readBeats()]);
+  all.sort((a, b) => a.t - b.t);
+  const past = {}; // [uid] = { joins: [t], ends: [t] }
+  all.forEach(e => { if (!e.uid || (e.type !== "join" && e.type !== "leave")) return; const h = past[e.uid] || (past[e.uid] = { joins: [], ends: [] }); (e.type === "join" ? h.joins : h.ends).push(e.t) });
+  const ev = all.filter(e => e.t >= from);
   const now = Math.floor(Date.now() / 1000), open = {}, last = {}, beat = bt, sessions = [], who = {}, dev = {};
   ev.forEach(e => { const k = e.job + "|" + e.uid; if (e.job) last[e.job] = Math.max(last[e.job] || 0, e.t);
     if (e.type === "client") dev[e.uid] = { dev: e.dev, w: e.w, h: e.h, inp: e.inp, fpsc: e.fpsc };
@@ -43,7 +49,9 @@ async function live(req, res) {
     else if (e.type === "purchase" && e.ok && who[e.uid]) who[e.uid].buys++ });
   Object.values(bt).forEach(b => { if (b.job) last[b.job] = Math.max(last[b.job] || 0, b.t) });
   const alive = Object.keys(last).filter(j => now - last[j] < 180);
-  const online = Object.values(open).filter(o => alive.includes(o.job)).map(o => { const b = beat[o.job], p = b && b.pl && b.pl[o.uid] || {}; return { ...o, ...p, ...(dev[o.uid] || {}), ls: p.ls || null } });
+  const online = Object.values(open).filter(o => alive.includes(o.job)).map(o => { const b = beat[o.job], p = b && b.pl && b.pl[o.uid] || {}, h = past[o.uid];
+    const prevEnd = h ? Math.max(-Infinity, ...h.ends.filter(t => t < o.since)) : -Infinity;
+    return { ...o, ...p, ...(dev[o.uid] || {}), ls: p.ls || null, visitNo: h ? h.joins.filter(t => t <= o.since).length : 1, gapSec: Number.isFinite(prevEnd) ? o.since - prevEnd : null } });
   const ids = [...new Set([...online.map(o => o.uid), ...sessions.slice(-30).map(s => s.uid), ...Object.values(who).sort((a, b) => b.last - a.last).slice(0, 40).map(w => w.uid)])].filter(Number.isFinite);
   const img = await heads(ids);
   res.setHeader("cache-control", "no-store");
