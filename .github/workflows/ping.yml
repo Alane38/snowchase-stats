@@ -53,3 +53,31 @@ jobs:
             git rebase origin/data
           done
           [ "$ok" -ge 10 ] || { echo "Relevé incomplet ($ok/13) : archivé mais marqué en échec"; exit 1; }
+      - name: Export quotidien des sessions (anonymisé)
+        if: always()
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          [ -n "$CRON_SECRET" ] || { echo "secret absent, export ignoré"; exit 0; }
+          git config user.name "snowchase-bot"
+          git config user.email "snowchase-bot@users.noreply.github.com"
+          if git fetch origin data; then git checkout -B data origin/data; else git checkout --orphan data; git rm -rf . > /dev/null 2>&1 || true; fi
+          mkdir -p sessions
+          n=0
+          for k in 1 2 3 4 5 6 7; do
+            d=$(date -u -d "$k days ago" +%Y-%m-%d)
+            [ -f "sessions/$d.json" ] && continue
+            if curl -sS -f --max-time 60 -H "Authorization: Bearer $CRON_SECRET" "https://snowchase-stats.vercel.app/api/export?day=$d" -o /tmp/ex.json; then
+              if grep -qE '"type"|"s":\[' /tmp/ex.json; then cp /tmp/ex.json "sessions/$d.json"; else echo '{"vide":true}' > "sessions/$d.json"; fi
+              n=$((n+1))
+            fi
+          done
+          if [ "$n" -gt 0 ]; then
+            git add sessions
+            git commit -m "sessions anonymisées ($n jour(s))"
+            for a in 1 2 3; do
+              git push origin data && break
+              git fetch origin data
+              git rebase origin/data
+            done
+          fi
