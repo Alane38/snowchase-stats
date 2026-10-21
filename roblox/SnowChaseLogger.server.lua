@@ -71,10 +71,11 @@ local function flush()
 	end
 end
 
+local pushBeat -- défini plus bas : un battement frais part avec chaque envoi anticipé (état des joueurs à jour)
 local function flushSoon()
 	if pending then return end
 	pending = true
-	task.delay(math.max(0, FLUSH_GAP - (os.clock() - lastFlush)), function() pending = false; flush() end)
+	task.delay(math.max(0, FLUSH_GAP - (os.clock() - lastFlush)), function() pending = false; if pushBeat then pcall(pushBeat) end; flush() end)
 end
 
 -- phase d'un joueur : dt = secondes depuis son entrée sur le serveur
@@ -162,6 +163,7 @@ end
 Players.PlayerAdded:Connect(onAdded)
 for _, p in ipairs(Players:GetPlayers()) do task.spawn(onAdded, p) end
 
+local lastLabel = setmetatable({}, { __mode = "k" }) -- dernier état envoyé par joueur
 -- État du jeu : lecture seule, jamais bloquant (task.spawn + pcall). Une phase "une seule fois" par joueur et par serveur.
 task.spawn(function()
 	local okState, GameState = pcall(function() return require(ServerScriptService.SnowChase.Core.State) end)
@@ -178,6 +180,7 @@ task.spawn(function()
 					elseif p:GetAttribute("ProfileLoaded") ~= true then label = "loading"
 					elseif alone then label = "alone"
 					else label = "lobby" end
+					if label ~= lastLabel[p] then lastLabel[p] = label; flushSoon() end -- un changement d'état part sans attendre la minute (temps réel, 22/10)
 					if label ~= "loading" then
 						local first = not (once[p] and once[p][label])
 						phase(p, label, nil, true)
@@ -229,9 +232,7 @@ local function snapshotPlayer(p)
 	return d
 end
 
-task.spawn(function() -- battement du serveur + état de chaque joueur
-	while true do
-		task.wait(BEAT_EVERY)
+pushBeat = function() -- battement du serveur + état de chaque joueur
 		local pl = {}
 		for _, p in ipairs(Players:GetPlayers()) do
 			local ok, d = pcall(snapshotPlayer, p)
@@ -239,8 +240,8 @@ task.spawn(function() -- battement du serveur + état de chaque joueur
 		end
 		push({ type = "beat", n = #Players:GetPlayers(), fps = math.floor(workspace:GetRealPhysicsFPS()),
 			up = os.time() - started, mem = math.floor(Stats:GetTotalMemoryUsageMb()), pl = pl })
-	end
-end)
+end
+task.spawn(function() while true do task.wait(BEAT_EVERY); pushBeat() end end)
 
 task.spawn(function() while true do task.wait(FLUSH_EVERY); flush() end end)
 game:BindToClose(function()
