@@ -53,6 +53,30 @@ jobs:
             git rebase origin/data
           done
           [ "$ok" -ge 10 ] || { echo "Relevé incomplet ($ok/12) : archivé mais marqué en échec"; exit 1; }
+      - name: Heure des publications du jeu
+        # game.updated de Roblox : une ligne par publication dans releves/publications.txt (branche data), pour dater
+        # chaque version sur le site. Sans effet sur le relevé si elle échoue
+        if: always()
+        continue-on-error: true
+        run: |
+          u=$(curl -sS -f --max-time 30 "https://games.roblox.com/v1/games?universeIds=10767392366" | jq -r '.data[0].updated // empty' | cut -c1-19) || exit 0
+          [ -n "$u" ] || { echo "updated absent"; exit 0; }
+          u="${u}Z"
+          git config user.name "snowchase-bot"
+          git config user.email "snowchase-bot@users.noreply.github.com"
+          git fetch origin data && git checkout -B data origin/data || exit 0
+          mkdir -p releves
+          touch releves/publications.txt
+          if [ "$(tail -n 1 releves/publications.txt)" = "$u" ]; then echo "pas de nouvelle publication ($u)"; exit 0; fi
+          grep -qx "$u" releves/publications.txt && exit 0
+          echo "$u" >> releves/publications.txt
+          git add releves/publications.txt
+          git commit -m "publication du jeu $u"
+          for a in 1 2 3; do
+            git push origin data && break
+            git fetch origin data
+            git rebase origin/data
+          done
       - name: Export quotidien des sessions (anonymisé)
         if: always()
         env:

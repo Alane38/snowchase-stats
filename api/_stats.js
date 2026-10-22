@@ -3,6 +3,11 @@
 // appareils. Toujours anonyme : des comptes et des médianes, jamais un joueur.
 const med = a => { if (!a.length) return null; const s = [...a].sort((x, y) => x - y), m = s.length >> 1; return s.length % 2 ? s[m] : Math.round((s[m - 1] + s[m]) / 2) };
 const pct = (a, b) => b ? Math.round(a / b * 100) : null;
+// moyenne à côté de la médiane : Roblox affiche une moyenne, tirée vers le haut par ceux qui restent longtemps
+export const avg = a => a.length ? Math.round(a.reduce((t, x) => t + x, 0) / a.length) : null;
+// durées des sessions terminées par tranche (secondes) : la forme de la distribution, que ni la médiane ni la moyenne ne montrent
+export const DUR_BUCKETS = [["lt30", 0, 30], ["30_60", 30, 60], ["1_2", 60, 120], ["2_5", 120, 300], ["5_10", 300, 600], ["10p", 600, Infinity]];
+export const durBuckets = a => DUR_BUCKETS.map(([k, lo, hi]) => { const n = a.filter(x => x >= lo && x < hi).length; return { k, n, pct: pct(n, a.length) } });
 const DAY = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Paris", year: "numeric", month: "2-digit", day: "2-digit" });
 const paris = t => DAY.format(new Date(t * 1000)); // AAAA-MM-JJ à Paris
 const RD = /^(rdb?)(\d+)_([wl])_(\d+)_(\d+)(?:_(\d+))?$/; // + fois touché depuis le 22/10 ; // manche n : gagnée ou perdue, touches, lancers ; rdb = contre SnowBot
@@ -64,7 +69,7 @@ export function sessionStats(sess, dev, vOf) {
     avgHits: rounds ? +(hits / rounds).toFixed(1) : null, avgThrows: rounds ? +(throws / rounds).toFixed(1) : null, accuracyPct: pct(hits, throws),
     quitAfterLoss: rate(after.l), quitAfterWin: rate(after.w), quitAfterSolo: rate(after.solo), quitAfterGroup: rate(after.group),
     proPct: (() => { const b = since(n => n === "pro_on" || n === "solo_after_round").filter(s => has(s, "play")); return b.length ? pct(b.filter(s => has(s, "pro_on")).length, b.length) : null })(), avgHitBy: hitByN ? +(hitBy / hitByN).toFixed(1) : null,
-    waitMedianSec: waits.length ? waits.sort((a, b) => a - b)[waits.length >> 1] : null, waitN: waits.length, resultsClosedPct: pct(closedN, played),
+    waitMedianSec: waits.length ? waits.sort((a, b) => a - b)[waits.length >> 1] : null, waitN: waits.length, resultsClosedPct: since(n => n === "results_closed").length ? pct(closedN, played) : null,
     quitSeconds: QUIT_AFTER };
 
   // économie : flocons gagnés (paliers earn_), dépensés (spend_), boutique ouverte sans achat, achats par skin, roue
@@ -80,7 +85,7 @@ export function sessionStats(sess, dev, vOf) {
     wheel: all.filter(s => has(s, "wheel_spin")).length, buys: Object.entries(buys).map(([skin, n]) => ({ skin, n })).sort((a, b) => b.n - a.n) };
 
   // social : ami sur le serveur, chat ; l'effet d'un ami sur la durée et la manche jouée
-  const grp = a => { const d = a.filter(s => !s.live && Number.isFinite(s.dur)); return { n: a.length, medianSec: med(d.map(s => s.dur)), playPct: pct(a.filter(s => has(s, "play")).length, a.length) } };
+  const grp = a => { const d = a.filter(s => !s.live && Number.isFinite(s.dur)); return { n: a.length, medianSec: med(d.map(s => s.dur)), avgSec: avg(d.map(s => s.dur)), playPct: pct(a.filter(s => has(s, "play")).length, a.length) } };
   const socBase = since(n => n === "with_friend" || n === "chat" || n.startsWith("earn_"));
   const social = { sessions: socBase.length, friendPct: pct(socBase.filter(s => has(s, "with_friend")).length, socBase.length), chatPct: pct(socBase.filter(s => has(s, "chat")).length, socBase.length),
     withFriend: grp(socBase.filter(s => has(s, "with_friend"))), alone: grp(socBase.filter(s => !has(s, "with_friend"))) };
@@ -90,7 +95,7 @@ export function sessionStats(sess, dev, vOf) {
   sess.forEach(s => { const c = dev[s.k]; if (!c) return; const small = c.dev === "mobile" && Number.isFinite(c.w) && Number.isFinite(c.h) && Math.min(c.w, c.h) < 360;
     [c.dev || "inconnu"].concat(small ? ["mobile_small"] : []).forEach(k => { const o = G[k] || (G[k] = { dev: k, n: 0, fps: [], load: [], dur: [], play: 0 }); o.n++;
       if (Number.isFinite(c.fpsc)) o.fps.push(c.fpsc); if (s.ph && Number.isFinite(s.ph.loaded)) o.load.push(Math.round(s.ph.loaded * 10)); if (!s.live && Number.isFinite(s.dur)) o.dur.push(s.dur); if (s.ph && s.ph.play != null) o.play++ }) });
-  const devices = Object.values(G).map(o => ({ dev: o.dev, n: o.n, fps: med(o.fps), loadSec: o.load.length ? med(o.load) / 10 : null, medianSec: med(o.dur), playPct: pct(o.play, o.n) })).sort((a, b) => b.n - a.n);
+  const devices = Object.values(G).map(o => ({ dev: o.dev, n: o.n, fps: med(o.fps), loadSec: o.load.length ? med(o.load) / 10 : null, medianSec: med(o.dur), avgSec: avg(o.dur), playPct: pct(o.play, o.n) })).sort((a, b) => b.n - a.n);
 
   return { fidelity: { days, versions: Object.values(V).sort((a, b) => b.v - a.v) }, rounds: roundsOut, economy, social, devices };
 }
