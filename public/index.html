@@ -508,7 +508,16 @@ r.appendChild(concl((d.filter?"":"Toutes versions : ")+[T.leftBeforePlay!=null?p
 const LV=!d.filter&&d.versions&&d.versions[0],cmp=f=>LV&&LV.sessions>=10?"v"+LV.v+" : "+String(f(LV)).replace(/ (%|s|min)/g,"\u00a0$1"):null;
 r.appendChild(factsBox([["Sessions ("+perS(d)+")",fm(T.sessions),cmp(x=>fm(x.sessions))],["Durée médiane",dur(T.medianSec),cmp(x=>dur(x.medianSec))],["Durée moyenne",dur(T.avgSec),cmp(x=>dur(x.avgSec))],["Partis avant de jouer",pctS(T.leftBeforePlay),cmp(x=>pctS(x.leftBeforePlay))],["Partis en moins de 30 s",pctS(T.bounce),cmp(x=>pctS(x.bounce))],["Restent 5 min ou plus",pctS(T.over5Pct),cmp(x=>pctS(x.over5Pct))],["Restent 10 min ou plus",pctS(T.over10Pct),cmp(x=>pctS(x.over10Pct))],["1re manche après (médiane)",dur(T.firstPlaySec)],["Sessions par joueur",T.players?String(+(T.sessions/T.players).toFixed(2)).replace(".",","):"–"]]));
 {const bp=bucketsPanel(d);if(bp)r.appendChild(bp)}
-r.appendChild(pathPanel());r.appendChild(cols(leftPanel(),funnelPanel()));r.appendChild(versionsPanel())}
+r.appendChild(pathPanel());{const ap=abPanel(d);if(ap)r.appendChild(ap)}r.appendChild(cols(leftPanel(),funnelPanel()));r.appendChild(versionsPanel())}
+// tests A/B du jeu (Analytics.Variants) : A et B tirés au sort par joueur, mesurés aux mêmes heures
+const AB_INFO={card:["Carte Bienvenue du tutoriel","A : carte 4 s avec une barre qui se vide · B : pas de carte"]},AB_MIN=150;
+function abPanel(d){const L=d&&d.ab||[];if(!L.length)return null;const w=h("div");L.forEach(x=>{const inf=AB_INFO[x.test]||["Test "+x.test,""],A=x.a,B=x.b,few=Math.min(A.newPlayers,B.newPlayers)<AB_MIN;
+w.appendChild(h("h4","",inf[0]));if(inf[1])w.appendChild(h("p","note",inf[1]));
+w.appendChild(concl(few?"Trop tôt pour conclure : "+A.newPlayers+" et "+B.newPlayers+" nouveaux joueurs, il en faut environ "+AB_MIN+" de chaque côté.":"Assez de joueurs pour comparer : regarder les écarts de plus de 5 points.",few?"":"good"));
+const t=h("table"),hr=h("tr");["Mesure","A","B"].forEach((c,i)=>hr.appendChild(h("th",i?"n":"",c)));const th=h("thead");th.appendChild(hr);t.appendChild(th);const tb=h("tbody");
+[["Sessions","sessions",fm],["dont nouveaux joueurs","newPlayers",fm],["Tutoriel fini (nouveaux)","tutoDonePct",pctS],["SKIP du tutoriel","tutoSkipPct",pctS],["Partis dans le tutoriel","tutoLostPct",pctS],["Nouveaux qui jouent une manche","newPlayPct",pctS],["Nouveaux qui restent 5 min","newOver5Pct",pctS],["Jouent une 2e manche (tous)","secondPct",pctS],["Durée médiane (tous)","medianSec",dur]].forEach(([l,k,f])=>{const tr=h("tr"),lc=h("td","",l);lc.style.whiteSpace="normal";tr.appendChild(lc);[A,B].forEach(g=>tr.appendChild(h("td","n",g[k]==null?"–":f(g[k]))));tb.appendChild(tr)});
+t.appendChild(tb);t.style.width="100%";const sc=h("div","tbl");sc.appendChild(t);w.appendChild(sc)});
+w.appendChild(h("p","note","Chaque joueur tire A ou B au hasard, et garde la même lettre à chaque visite. Les deux groupes jouent aux mêmes heures : la comparaison n'est pas faussée par l'heure."));return pn("Tests A/B",w)}
 // Sessions : qui, d'où, quand
 function sessSessions(r){const d=sessData(r);if(!d)return;const T=d.totals;
 H2(r,"Sessions",perim(d)+". Mesuré dans le jeu, code court par joueur.");
