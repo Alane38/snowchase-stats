@@ -37,9 +37,9 @@ export default async function handler(req, res) {
   const vOf = s => srv[Object.keys(srv).find(j => j.startsWith(s.job))]?.v, latest = Math.max(0, ...Object.values(srv).map(s => s.v || 0));
   // filtre par version (?v=887, ?from=873, ?to=) : en mémoire, sur les sessions déjà construites (aucune lecture en
   // plus) ; le tableau des versions, les serveurs, l'affluence et les joueurs en ligne restent complets
-  const int = x => /^\d{1,6}$/.test(String(x ?? "")) ? +x : null, q = req.query || {};
-  const fv = int(q.v), ff = fv ?? int(q.from), ft = fv ?? int(q.to), filtered = ff != null || ft != null;
-  const all = sess, fs = filtered ? sess.filter(s => { const v = vOf(s); return v != null && (ff == null || v >= ff) && (ft == null || v <= ft) }) : sess;
+  const int = x => /^\d{1,6}$/.test(String(x ?? "")) ? +x : null, ts = x => /^\d{9,11}$/.test(String(x ?? "")) ? +x : null, q = req.query || {};
+  const fv = int(q.v), ff = fv ?? int(q.from), ft = fv ?? int(q.to), vfilt = ff != null || ft != null, t0 = ts(q.t0), t1 = ts(q.t1), filtered = vfilt || t0 != null || t1 != null; // t0/t1 : sessions commencées dans cette plage (heure du pic, 22/10)
+  const all = sess, fs = filtered ? sess.filter(s => { if ((t0 != null && s.t < t0) || (t1 != null && s.t >= t1)) return false; if (!vfilt) return true; const v = vOf(s); return v != null && (ff == null || v >= ff) && (ft == null || v <= ft) }) : sess;
   const fk = new Set(fs.map(s => s.k));
   const done = fs.filter(s => Number.isFinite(s.dur)), durs = done.map(s => s.dur);
   const tracked = done.filter(s => s.ph && Object.keys(s.ph).length), withPlay = done.filter(s => Number.isFinite(s.ph && s.ph.play)), playDurs = withPlay.map(s => Math.max(0, s.dur - s.ph.play)), loads = fs.map(s => s.ph && s.ph.loaded).filter(Number.isFinite);
@@ -73,7 +73,7 @@ export default async function handler(req, res) {
   res.setHeader("cache-control", "s-maxage=20, stale-while-revalidate=60"); // lecture incrémentale : recalculer coûte peu
   res.status(200).json({ at: new Date().toISOString(), days,
     fresh: { event: ev.length ? ev[ev.length - 1].t : null, sample: samples.length ? samples[samples.length - 1].t : null, beat: Object.values(bt).reduce((m, b) => Math.max(m, b.t || 0), 0) || null },
-    filter: filtered ? { v: fv, from: ff, to: ft, sessions: fs.length } : null,
+    filter: filtered ? { v: fv, from: ff, to: ft, t0, t1, sessions: fs.length } : null,
     totals: { staffExcluded: staff, sessions: fs.length, players: filtered ? new Set(fs.map(s => s.p)).size : new Set(ev.filter(e => e.type === "join").map(e => e.p)).size, medianSec: med(durs), avgSec: avg(durs), durBuckets: durBuckets(durs), over5Pct: durs.length ? +(durs.filter(x => x >= 300).length / durs.length * 100).toFixed(1) : null, over10Pct: durs.length ? +(durs.filter(x => x >= 600).length / durs.length * 100).toFixed(1) : null, medianPlaySec: med(playDurs), firstPlaySec: med(withPlay.map(s => Math.round(s.ph.play))), medianLoadSec: loads.length ? +(med(loads.map(x => Math.round(x * 10))) / 10).toFixed(1) : null, leftBeforePlay: tracked.length ? +((tracked.filter(s => !Number.isFinite(s.ph.play)).length) / tracked.length * 100).toFixed(1) : null, neverMoved: tracked.length ? +(tracked.filter(s => s.ph.move == null).length / tracked.length * 100).toFixed(1) : null, bounce: done.length ? +(done.filter(s => s.dur < 30).length / done.length * 100).toFixed(1) : null,
       premium: fs.length ? +(fs.filter(s => s.prem).length / fs.length * 100).toFixed(1) : null, newAccounts: fs.length ? +(fs.filter(s => Number.isFinite(s.acct) && s.acct < 30).length / fs.length * 100).toFixed(1) : null, deaths: filtered ? fs.reduce((a, s) => a + (s.deaths || 0), 0) : ev.filter(e => e.type === "death").length, purchases: filtered ? fs.reduce((a, s) => a + (s.buys || 0), 0) : ev.filter(e => e.type === "purchase" && e.ok).length },
     flow, servers: Object.values(srv).sort((a, b) => b.t0 - a.t0).slice(0, 50).map(s => ({ ...s, lifeSec: s.t1 - s.t0 })),
