@@ -24,19 +24,27 @@ jobs:
           if [ "$code" = 401 ]; then echo "Refusé (401) : le secret CRON_SECRET de GitHub n'a pas la même valeur que celui de Vercel"; exit 1; fi
           D=$(date -u +%Y-%m-%dT%H-%M)
           curl -sS -f --max-time 60 "https://snowchase-stats.vercel.app/api/public?x=$(date +%s)" -o /tmp/public.json || echo "{}" > /tmp/public.json
+          # nombre de parties lu dans l'en-tête de la 1re (« partie 1/14 ») : la liste des requêtes grandit
+          np=13
           ok=0
-          for i in 0 1 2 3 4 5 6 7 8 9 10 11; do
+          i=0
+          while [ "$i" -lt "$np" ]; do
             got=0
             for a in 1 2; do
               if curl -sS -f --max-time 90 -H "Authorization: Bearer $CRON_SECRET" "https://snowchase-stats.vercel.app/api/snapshot?p=$i&x=$(date +%s)" -o /tmp/out/p$i.txt; then got=1; break; fi
               sleep 20
             done
-            if [ "$got" = 1 ]; then ok=$((ok+1)); else echo "partie $i : echec apres 2 essais" > /tmp/out/p$i.txt; fi
+            if [ "$got" = 1 ]; then
+              ok=$((ok+1))
+              n=$(head -1 /tmp/out/p$i.txt | sed -n 's#.*partie [0-9]*/\([0-9]*\).*#\1#p')
+              [ -n "$n" ] && np=$n
+            else echo "partie $i : echec apres 2 essais" > /tmp/out/p$i.txt; fi
+            i=$((i+1))
             sleep 20
           done
-          echo "parties recues : $ok/12"
+          echo "parties recues : $ok/$np"
           if [ "$ok" -eq 0 ]; then echo "Aucune partie recue, rien a archiver"; exit 1; fi
-          for i in 0 1 2 3 4 5 6 7 8 9 10 11; do cat /tmp/out/p$i.txt; echo; done > /tmp/snap.txt
+          for i in $(seq 0 $((np-1))); do cat /tmp/out/p$i.txt; echo; done > /tmp/snap.txt
           git config user.name "snowchase-bot"
           git config user.email "snowchase-bot@users.noreply.github.com"
           if git fetch origin data; then git checkout -B data origin/data; else git checkout --orphan data; git rm -rf . > /dev/null; fi
@@ -46,13 +54,13 @@ jobs:
           cp /tmp/snap.txt releves/latest.txt
           cp /tmp/public.json releves/latest-public.json
           git add releves
-          git commit -m "relevé $D ($ok/12 parties)"
+          git commit -m "relevé $D ($ok/$np parties)"
           for a in 1 2 3; do
             git push origin data && break
             git fetch origin data
             git rebase origin/data
           done
-          [ "$ok" -ge 10 ] || { echo "Relevé incomplet ($ok/12) : archivé mais marqué en échec"; exit 1; }
+          [ "$ok" -ge $((np-2)) ] || { echo "Relevé incomplet ($ok/$np) : archivé mais marqué en échec"; exit 1; }
       - name: Heure des publications du jeu
         # game.updated de Roblox : une ligne par publication dans releves/publications.txt (branche data), pour dater
         # chaque version sur le site. Sans effet sur le relevé si elle échoue
