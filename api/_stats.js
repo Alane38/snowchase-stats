@@ -34,7 +34,7 @@ export function sessionStats(sess, dev, vOf) {
 
   // manches : le détail rd/rdb des 5 premières, sinon r1_won / r1_lost / r2 (versions plus anciennes)
   const first = { real: [0, 0], bot: [0, 0], any: [0, 0] }, after = { l: [0, 0], w: [0, 0], solo: [0, 0], group: [0, 0] };
-  let cut = 0, played = 0, second = 0, rounds = 0, hits = 0, throws = 0, pro = 0, hitByN = 0, hitBy = 0, closedN = 0;
+  let cut = 0, botDone = [0, 0], played = 0, second = 0, rounds = 0, hits = 0, throws = 0, pro = 0, hitByN = 0, hitBy = 0, closedN = 0;
   const waits = [];
   all.forEach(s => {
     const seq = s.seq || [], rs = seq.map(x => ({ x, m: x.ph.match(RD) })).filter(y => y.m);
@@ -43,6 +43,7 @@ export function sessionStats(sess, dev, vOf) {
       played++; if (rs.some(y => +y.m[2] >= 2)) second++;
       const f = rs.find(y => y.m[2] === "1");
       // une 1re manche coupée (duel SnowBot arrêté par l'arrivée d'un joueur, départs, annulation) n'est ni gagnée ni perdue
+      if (f && f.m[1] === "rdb" && f.m[7] && "gt".includes(f.m[7])) { botDone[0]++; if (f.m[3] === "w") botDone[1]++ } // allés au bout (jeu v901+)
       if (f && f.m[7] && !"gt".includes(f.m[7])) cut++;
       else if (f) { const k = f.m[1] === "rdb" ? "bot" : "real"; first[k][0]++; first.any[0]++; if (f.m[3] === "w") { first[k][1]++; first.any[1]++ } }
       rs.forEach(y => { rounds++; hits += +y.m[4]; throws += +y.m[5]; if (y.m[6] != null) { hitByN++; hitBy += +y.m[6] } });
@@ -67,7 +68,7 @@ export function sessionStats(sess, dev, vOf) {
   const rate = a => ({ n: a[0], pct: pct(a[1], a[0]) });
   const withPlay = all.filter(s => has(s, "play")).length; // entré dans une manche (étiquette du logger, toutes versions)
   const roundsOut = { sessions: all.length, played: withPlay, detailedSessions: played, playedPct: pct(withPlay, all.length), secondPct: pct(second, played),
-    first: { real: rate(first.real), bot: rate(first.bot), any: rate(first.any), cut }, detailed: rounds,
+    first: { real: rate(first.real), bot: rate(first.bot), any: rate(first.any), cut, botDone: rate(botDone) }, detailed: rounds,
     avgHits: rounds ? +(hits / rounds).toFixed(1) : null, avgThrows: rounds ? +(throws / rounds).toFixed(1) : null, accuracyPct: pct(hits, throws),
     quitAfterLoss: rate(after.l), quitAfterWin: rate(after.w), quitAfterSolo: rate(after.solo), quitAfterGroup: rate(after.group),
     proPct: (() => { const b = since(n => n === "pro_on" || n === "solo_after_round").filter(s => has(s, "play")); return b.length ? pct(b.filter(s => has(s, "pro_on")).length, b.length) : null })(), avgHitBy: hitByN ? +(hitBy / hitByN).toFixed(1) : null,
