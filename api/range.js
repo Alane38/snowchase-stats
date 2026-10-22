@@ -32,7 +32,7 @@ export default async function handler(req, res) {
   // cartes de positions : cases de 20 studs, séparées en manche / hors manche (le tutoriel est exclu : autre zone)
   const P = [{}, {}];
   ps.forEach(x => (x.c || []).forEach(q => { const g = q[2] === 1 ? 1 : q[2] === 0 ? 0 : -1; if (g < 0) return; const k = q[0] + "," + q[1]; P[g][k] = (P[g][k] || 0) + 1 }));
-  const top = o => Object.entries(o).sort((a, b) => b[1] - a[1]).slice(0, 600).map(([k, n]) => { const [x, z] = k.split(",").map(Number); return [x, z, n] });
+  const top = o => Object.entries(o).sort((a, b) => b[1] - a[1]).slice(0, 3000).map(([k, n]) => { const [x, z] = k.split(",").map(Number); return [x, z, n] });
   const pos = { lobby: top(P[0]), play: top(P[1]), snaps: ps.length };
   // retours, d'après les entrées et sorties (depuis le début du logger, 20/10 au soir) : qui revient, au bout de combien
   // de temps, et par jour de premier passage la part revenue le lendemain (jours de Paris). « Premier passage » = première
