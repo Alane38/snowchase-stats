@@ -5,7 +5,7 @@ const med = a => { if (!a.length) return null; const s = [...a].sort((x, y) => x
 const pct = (a, b) => b ? Math.round(a / b * 100) : null;
 const DAY = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Paris", year: "numeric", month: "2-digit", day: "2-digit" });
 const paris = t => DAY.format(new Date(t * 1000)); // AAAA-MM-JJ à Paris
-const RD = /^(rdb?)(\d+)_([wl])_(\d+)_(\d+)$/; // manche n : gagnée ou perdue, touches, lancers ; rdb = contre SnowBot
+const RD = /^(rdb?)(\d+)_([wl])_(\d+)_(\d+)(?:_(\d+))?$/; // + fois touché depuis le 22/10 ; // manche n : gagnée ou perdue, touches, lancers ; rdb = contre SnowBot
 const QUIT_AFTER = 40; // secondes : un départ dans ce délai après la fin d'une manche compte comme « juste après »
 
 export function sessionStats(sess, dev, vOf) {
@@ -29,7 +29,8 @@ export function sessionStats(sess, dev, vOf) {
 
   // manches : le détail rd/rdb des 5 premières, sinon r1_won / r1_lost / r2 (versions plus anciennes)
   const first = { real: [0, 0], bot: [0, 0], any: [0, 0] }, after = { l: [0, 0], w: [0, 0], solo: [0, 0], group: [0, 0] };
-  let played = 0, second = 0, rounds = 0, hits = 0, throws = 0, pro = 0;
+  let played = 0, second = 0, rounds = 0, hits = 0, throws = 0, pro = 0, hitByN = 0, hitBy = 0, closedN = 0;
+  const waits = [];
   all.forEach(s => {
     const seq = s.seq || [], rs = seq.map(x => ({ x, m: x.ph.match(RD) })).filter(y => y.m);
     let last = null;
@@ -37,7 +38,10 @@ export function sessionStats(sess, dev, vOf) {
       played++; if (rs.some(y => +y.m[2] >= 2)) second++;
       const f = rs.find(y => y.m[2] === "1");
       if (f) { const k = f.m[1] === "rdb" ? "bot" : "real"; first[k][0]++; first.any[0]++; if (f.m[3] === "w") { first[k][1]++; first.any[1]++ } }
-      rs.forEach(y => { rounds++; hits += +y.m[4]; throws += +y.m[5] });
+      rs.forEach(y => { rounds++; hits += +y.m[4]; throws += +y.m[5]; if (y.m[6] != null) { hitByN++; hitBy += +y.m[6] } });
+      // attente entre la fin d'une manche et le début de la suivante (rs<n>, depuis le 22/10)
+      rs.forEach(y => { const nx = seq.find(x => x.ph === "rs" + (+y.m[2] + 1)); if (nx && Number.isFinite(nx.dt) && Number.isFinite(y.x.dt) && nx.dt >= y.x.dt) waits.push(nx.dt - y.x.dt) });
+      if (has(s, "results_closed")) closedN++;
       last = { won: rs[rs.length - 1].m[3] === "w", dt: rs[rs.length - 1].x.dt };
     } else {
       const r1 = seq.find(x => x.ph === "r1_won" || x.ph === "r1_lost");
@@ -59,7 +63,9 @@ export function sessionStats(sess, dev, vOf) {
     first: { real: rate(first.real), bot: rate(first.bot), any: rate(first.any) }, detailed: rounds,
     avgHits: rounds ? +(hits / rounds).toFixed(1) : null, avgThrows: rounds ? +(throws / rounds).toFixed(1) : null, accuracyPct: pct(hits, throws),
     quitAfterLoss: rate(after.l), quitAfterWin: rate(after.w), quitAfterSolo: rate(after.solo), quitAfterGroup: rate(after.group),
-    proPct: (() => { const b = since(n => n === "pro_on" || n === "solo_after_round").filter(s => has(s, "play")); return b.length ? pct(b.filter(s => has(s, "pro_on")).length, b.length) : null })(), quitSeconds: QUIT_AFTER };
+    proPct: (() => { const b = since(n => n === "pro_on" || n === "solo_after_round").filter(s => has(s, "play")); return b.length ? pct(b.filter(s => has(s, "pro_on")).length, b.length) : null })(), avgHitBy: hitByN ? +(hitBy / hitByN).toFixed(1) : null,
+    waitMedianSec: waits.length ? waits.sort((a, b) => a - b)[waits.length >> 1] : null, waitN: waits.length, resultsClosedPct: pct(closedN, played),
+    quitSeconds: QUIT_AFTER };
 
   // économie : flocons gagnés (paliers earn_), dépensés (spend_), boutique ouverte sans achat, achats par skin, roue
   const tracked = all.filter(s => Object.keys(s.ph).some(n => n.startsWith("earn_") || n.startsWith("spend_") || n === "open_shop" || n.startsWith("buy_")));
