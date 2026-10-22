@@ -1,13 +1,13 @@
 // Agrégats PUBLICS (aucun pseudo, aucun userId) calculés depuis Redis (événements, relevés des serveurs, battements).
 // Cache CDN 2 min pour limiter les lectures.
-import { ready, readEvents, readSamples, readBeats, day } from "./_db.js";
+import { ready, readEvents, readSamples, readBeats, readPos, day } from "./_db.js";
 import { sessionStats, avg, durBuckets } from "./_stats.js";
 const med = a => { if (!a.length) return null; const s = [...a].sort((x, y) => x - y), m = s.length >> 1; return s.length % 2 ? s[m] : Math.round((s[m - 1] + s[m]) / 2) };
 export default async function handler(req, res) {
   if (!ready()) return res.status(503).json({ error: "base non configurée" });
   const days = [1, 0].map(d => day(d));
-  let ev, samples, bt;
-  try { [ev, samples, bt] = await Promise.all([readEvents(days), readSamples(days), readBeats()]) } catch (e) { return res.status(502).json({ error: "base indisponible" }) }
+  let ev, samples, bt, ps;
+  try { [ev, samples, bt, ps] = await Promise.all([readEvents(days), readSamples(days), readBeats(), readPos(days)]) } catch (e) { return res.status(502).json({ error: "base indisponible" }) }
   for (let i = ev.length - 1; i >= 0; i--) if (!ev[i].job) ev.splice(i, 1); // événements de test Studio (pas d'id de serveur) exclus des stats publiques
   ev.sort((a, b) => a.t - b.t); samples.sort((a, b) => a.t - b.t);
   // affluence : paquets de 10 minutes
@@ -54,6 +54,13 @@ export default async function handler(req, res) {
   lv.forEach(s => Object.entries(s.ph || {}).forEach(([n, dt]) => (PH[n] = PH[n] || []).push(dt)));
   const phases = { v: (filtered ? (vs.length ? Math.max(...vs) : null) : latest) || null, vFrom: vs.length ? Math.min(...vs) : null, sessions: lv.length, steps: Object.entries(PH).map(([name, a]) => ({ name, n: a.length, medDt: med(a.map(x => Math.round(x))) })).sort((a, b) => b.n - a.n),
     leftAfter: Object.entries(lv.filter(s => !s.live && s.last).reduce((o, s) => (o[s.last] = (o[s.last] || 0) + 1, o), {})).map(([name, n]) => ({ name, n })).sort((a, b) => b.n - a.n) };
+  // avec un filtre : le parcours d'une session et les cartes de positions sur les seules sessions filtrées (Alane, 23/10 :
+  // « les stats ne chargent pas toutes en fonction de ce que j'ai trié ») ; sans filtre, l'onglet garde ceux de /api/range
+  const fTr = fs.filter(s => s.ph && Object.keys(s.ph).length), fN = f => fTr.filter(f).length;
+  const funnel = filtered ? { sessions: fTr.length, loaded: fN(s => s.ph.loaded != null), spawn: fN(s => s.ph.spawn != null), move: fN(s => s.ph.move != null), play: fN(s => s.ph.play != null), alone: fN(s => s.ph.alone != null), tuto: fN(s => s.ph.tuto != null), stay30: fN(s => Number.isFinite(s.dur) && s.dur >= 30) } : null;
+  // positions : la photo d'un serveur (j, depuis le 23/10) compte si elle tombe dans la plage d'heures et, avec une version, si son serveur l'a
+  const posF = !filtered ? null : (() => { const P = [{}, {}]; let n = 0, noJob = 0; (ps || []).forEach(x => { if ((t0 != null && x.t < t0) || (t1 != null && x.t >= t1)) return; if (vfilt) { if (!x.j) { noJob++; return } const v = srv[Object.keys(srv).find(k => k.startsWith(x.j))]?.v; if (v == null || (ff != null && v < ff) || (ft != null && v > ft)) return } n++; (x.c || []).forEach(q => { const g = q[2] === 1 ? 1 : q[2] === 0 ? 0 : -1; if (g < 0) return; const k = q[0] + "," + q[1]; P[g][k] = (P[g][k] || 0) + 1 }) });
+    const top = o => Object.entries(o).sort((a, b) => b[1] - a[1]).slice(0, 3000).map(([k, c]) => { const [x, z] = k.split(",").map(Number); return [x, z, c] }); return { lobby: top(P[0]), play: top(P[1]), snaps: n, skippedOld: noJob } })();
   // tests A/B (jeu, Analytics.Variants, 23/10) : la phase ab_<test>_<a|b> range la session ; A et B aux mêmes heures
   const AB = {}; fs.forEach(s => Object.keys(s.ph || {}).forEach(n => { const m = /^ab_([a-z0-9]+)_([ab])$/.exec(n); if (m) (AB[m[1]] = AB[m[1]] || { a: [], b: [] })[m[2]].push(s) }));
   const pc = (x, n) => n ? Math.round(x / n * 100) : null, has = (s, n) => s.ph && s.ph[n] != null;
@@ -84,7 +91,7 @@ export default async function handler(req, res) {
     filter: filtered ? { v: fv, from: ff, to: ft, t0, t1, sessions: fs.length } : null,
     totals: { staffExcluded: staff, sessions: fs.length, players: filtered ? new Set(fs.map(s => s.p)).size : new Set(ev.filter(e => e.type === "join").map(e => e.p)).size, medianSec: med(durs), avgSec: avg(durs), durBuckets: durBuckets(durs), over5Pct: durs.length ? +(durs.filter(x => x >= 300).length / durs.length * 100).toFixed(1) : null, over10Pct: durs.length ? +(durs.filter(x => x >= 600).length / durs.length * 100).toFixed(1) : null, medianPlaySec: med(playDurs), firstPlaySec: med(withPlay.map(s => Math.round(s.ph.play))), medianLoadSec: loads.length ? +(med(loads.map(x => Math.round(x * 10))) / 10).toFixed(1) : null, leftBeforePlay: tracked.length ? +((tracked.filter(s => !Number.isFinite(s.ph.play)).length) / tracked.length * 100).toFixed(1) : null, neverMoved: tracked.length ? +(tracked.filter(s => s.ph.move == null).length / tracked.length * 100).toFixed(1) : null, bounce: done.length ? +(done.filter(s => s.dur < 30).length / done.length * 100).toFixed(1) : null,
       premium: fs.length ? +(fs.filter(s => s.prem).length / fs.length * 100).toFixed(1) : null, newAccounts: fs.length ? +(fs.filter(s => Number.isFinite(s.acct) && s.acct < 30).length / fs.length * 100).toFixed(1) : null, deaths: filtered ? fs.reduce((a, s) => a + (s.deaths || 0), 0) : ev.filter(e => e.type === "death").length, purchases: filtered ? fs.reduce((a, s) => a + (s.buys || 0), 0) : ev.filter(e => e.type === "purchase" && e.ok).length },
-    ab, flow, servers: Object.values(srv).sort((a, b) => b.t0 - a.t0).slice(0, 50).map(s => ({ ...s, lifeSec: s.t1 - s.t0 })),
+    ab, funnel, pos: posF, flow, servers: Object.values(srv).sort((a, b) => b.t0 - a.t0).slice(0, 50).map(s => ({ ...s, lifeSec: s.t1 - s.t0 })),
     sessions: [...fs].sort((a, b) => b.t - a.t).slice(0, 100).map(s => ({ p: s.p, job: s.job, t: s.t, dur: s.dur, reg: s.reg, acct: s.acct, prem: !!s.prem, src: s.src, deaths: s.deaths, live: !!s.live, load: s.ph && s.ph.loaded != null ? s.ph.loaded : null, spawn: s.ph && s.ph.spawn != null ? s.ph.spawn : null, move: s.ph && s.ph.move != null ? s.ph.move : null, play: s.ph && s.ph.play != null ? s.ph.play : null })),
     phases, versions, stats, split, online, regions: cnt(fs, s => s.reg), devices, sources: cnt(fs, s => s.src) });
 }
