@@ -95,7 +95,7 @@ const SD=()=>vfOn()?(S.sessF||{st:"load"}):S.sess;
 // périmètre des chiffres du jeu, écrit dans chaque titre : deux blocs de périmètres différents empilés sans le dire
 // passaient pour un bug (« la durée médiane c'est la même partout », Alane 22/10)
 const perim=d=>{const f=d&&d.filter;return(f&&(f.t0||f.t1)?"Sessions commencées "+tfText():"Hier et aujourd'hui")+" · "+(!f||(f.v==null&&f.from==null)?"toutes versions":f.v!=null?"v"+f.v:f.from!=null&&f.to!=null?"v"+f.from+" à v"+f.to:"depuis la v"+f.from)};
-const perS=d=>{const f=d&&d.filter;return!f?"toutes versions":f.v!=null?"v"+f.v:"depuis la v"+f.from};
+const perS=d=>{const f=d&&d.filter;return!f||(f.v==null&&f.from==null)?(f&&(f.t0||f.t1)?tfText():"toutes versions"):f.v!=null?"v"+f.v:"depuis la v"+f.from};
 const MEDNOTE="Médiane : le joueur du milieu. La moyenne est tirée vers le haut par ceux qui restent longtemps ; Roblox affiche une moyenne.";
 // version la plus récente vue sur un serveur (logger public et vue privée)
 const latestV=()=>Math.max(0,...((S.sess&&S.sess.d&&S.sess.d.servers)||[]).map(x=>x.v||0),...(typeof ADM!=="undefined"&&ADM.d&&ADM.d.servers||[]).map(x=>x.v||0));
