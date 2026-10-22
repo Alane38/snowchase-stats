@@ -2,7 +2,12 @@ name: ping
 on:
   schedule:
     - cron: "7,37 * * * *"
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      partiel:
+        description: "Exporter aussi la journée en cours (AAAA-MM-JJ, UTC) dans sessions/<jour>-partiel.json"
+        required: false
+        default: ""
 permissions:
   contents: write
 concurrency:
@@ -104,6 +109,13 @@ jobs:
               n=$((n+1))
             fi
           done
+          # journée en cours, à la demande (22/10 : analyser le pic du soir sans attendre minuit UTC) ; écrasée à chaque fois
+          P="${{ github.event.inputs.partiel }}"
+          if echo "$P" | grep -qE '^[0-9]{4}-[0-9]{2}-[0-9]{2}$'; then
+            if curl -sS -f --max-time 60 -H "Authorization: Bearer $CRON_SECRET" "https://snowchase-stats.vercel.app/api/export?day=$P" -o /tmp/exp.json; then
+              cp /tmp/exp.json "sessions/$P-partiel.json"; n=$((n+1))
+            fi
+          fi
           if [ "$n" -gt 0 ]; then
             git add sessions
             git commit -m "sessions anonymisées ($n jour(s))"
