@@ -38,7 +38,7 @@ export default async function handler(req, res) {
   // filtre par version (?v=887, ?from=873, ?to=) : en mémoire, sur les sessions déjà construites (aucune lecture en
   // plus) ; le tableau des versions, les serveurs, l'affluence et les joueurs en ligne restent complets
   const int = x => /^\d{1,6}$/.test(String(x ?? "")) ? +x : null, ts = x => /^\d{9,11}$/.test(String(x ?? "")) ? +x : null, q = req.query || {};
-  const fv = int(q.v), ff = fv ?? int(q.from), ft = fv ?? int(q.to), vfilt = ff != null || ft != null, t0 = ts(q.t0), t1 = ts(q.t1), filtered = vfilt || t0 != null || t1 != null; // t0/t1 : sessions commencées dans cette plage (heure du pic, 22/10)
+  const fv = q.v === "latest" ? latest || null : int(q.v), ff = fv ?? int(q.from), ft = fv ?? int(q.to), vfilt = ff != null || ft != null, t0 = ts(q.t0), t1 = ts(q.t1), filtered = vfilt || t0 != null || t1 != null; // t0/t1 : sessions commencées dans cette plage (heure du pic, 22/10)
   const all = sess, fs = filtered ? sess.filter(s => { if ((t0 != null && s.t < t0) || (t1 != null && s.t >= t1)) return false; if (!vfilt) return true; const v = vOf(s); return v != null && (ff == null || v >= ff) && (ft == null || v <= ft) }) : sess;
   const fk = new Set(fs.map(s => s.k));
   const done = fs.filter(s => Number.isFinite(s.dur)), durs = done.map(s => s.dur);
