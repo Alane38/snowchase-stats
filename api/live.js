@@ -19,7 +19,7 @@ export default async function handler(req, res) {
     if (e.type === "client") dev[k] = e;
     if (e.type === "join") open[k] = { k, p: e.p && e.p.slice(0, 6), pFull: e.p, job: e.job && e.job.slice(0, 8), jf: e.job, uid: e.uid, t: e.t, reg: e.reg, acct: e.acct, prem: e.prem, src: e.src, dur: null, deaths: 0, buys: 0, ph: {}, seq: [] };
     else if (e.type === "leave") { const o = open[k] || { k, p: e.p && e.p.slice(0, 6), job: e.job && e.job.slice(0, 8), t: e.t - (e.dur || 0), deaths: 0, buys: 0, ph: {}, seq: [] }; o.dur = e.dur; o.end = e.t; sess.push(o); delete open[k] }
-    else if (e.type === "phase" && open[k] && e.ph && Number.isFinite(e.dt)) { if (open[k].ph[e.ph] == null) open[k].ph[e.ph] = e.dt; open[k].last = e.ph; if (open[k].seq.length < 60) open[k].seq.push({ ph: e.ph, dt: e.dt }) }
+    else if (e.type === "phase" && open[k] && e.ph && Number.isFinite(e.dt)) { if (open[k].ph[e.ph] == null) open[k].ph[e.ph] = e.dt; open[k].last = e.ph; if (open[k].seq.length < 300) open[k].seq.push({ ph: e.ph, dt: e.dt }) }
     else if (e.type === "death" && open[k]) open[k].deaths++;
     else if (e.type === "purchase" && e.ok) { const o = open[k]; if (o) o.buys++ }
     if (e.job) { const s = srv[e.job] || (srv[e.job] = { job: e.job.slice(0, 8), t0: e.t, t1: e.t, peak: 0, joins: 0, v: e.v }); s.t0 = Math.min(s.t0, e.t); s.t1 = Math.max(s.t1, e.t); if (e.type === "join") s.joins++; if (Number.isFinite(e.n)) s.peak = Math.max(s.peak, e.n); if (e.type === "server_end") { s.ended = true; if (e.peak) s.peak = Math.max(s.peak, e.peak) } } });
