@@ -498,6 +498,12 @@ r.appendChild(pn("",table([{k:"dev",t:"Appareil",f:v=>DEVN[v]||v},{k:"n",t:"Sess
 // mise à jour automatique : attendre qu'on ait fini de taper ou de choisir dans un menu (le clavier se fermait, audit 23/10)
 const busy=()=>{const a=document.activeElement,v=document.getElementById("view");return !!(a&&v&&v.contains(a)&&/^(INPUT|SELECT|TEXTAREA)$/.test(a.tagName))};
 function bgRender(){if(busy())S.pend=1;else render()}
+// nouvelle version du site : l'app installée restait sur l'ancienne page tant qu'on ne la fermait pas (Alane, 23/10 :
+// « wait_hurry » affiché brut alors que son libellé était en ligne). Toutes les 2 min, la page compare la sienne à celle
+// du serveur et se recharge quand rien n'est en cours de saisie ; l'onglet et les filtres sont gardés (localStorage)
+const sigOf=t=>{let x=0;for(let i=0;i<t.length;i+=7)x=(x*31+t.charCodeAt(i))|0;return t.length+":"+x},MAINJS=t=>t.includes("const S={series"),pageSig=sigOf(([...document.scripts].find(x=>MAINJS(x.textContent))||{textContent:""}).textContent);
+async function checkPage(){if(document.hidden)return;try{const r=await fetch("/?page="+Date.now(),{cache:"no-store"});if(!r.ok)return;const js=[...(await r.text()).matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g)].map(x=>x[1]).find(MAINJS);if(js&&sigOf(js)!==pageSig&&!busy())location.reload()}catch(e){}}
+checkPage();setInterval(checkPage,120000);
 const pendGo=()=>{if(S.pend&&!busy()){S.pend=0;render()}};document.addEventListener("focusout",()=>setTimeout(pendGo,60));setInterval(pendGo,1500); // l'événement de sortie de champ n'arrive pas toujours
 async function loadSess(q){try{const r=await fetch("/api/live");if(!r.ok)throw 0;S.sess={st:"ok",d:await r.json()}}catch(e){if(!(q&&S.sess&&S.sess.st==="ok"))S.sess={st:"err"}}if(vfOn()){const qs=vfQ();try{const r=await fetch("/api/live"+qs);if(!r.ok)throw 0;S.sessF={st:"ok",d:await r.json(),q:qs}}catch(e){if(!(q&&S.sessF&&S.sessF.st==="ok"&&S.sessF.q===qs))S.sessF={st:"err"}}}if(!q)render();else if(S.tab==="apercu"||S.tab==="live"||S.tab==="jeu"||S.tab==="joueurs")bgRender()}
 async function loadRange(){try{const r=await fetch("/api/range");if(!r.ok)throw 0;S.range={st:"ok",d:await r.json()}}catch(e){if(!(S.range&&S.range.st==="ok"))S.range={st:"err"}}render()}
