@@ -1,0 +1,148 @@
+SNOW CHASE relevé 28/10/2026 18:30:49 | partie 1/14 | * = provisoire
+DailyActiveUsers [OneDay] 10-14=1 10-15=3 10-16=10 10-17=2 10-18=6 10-19=2 10-20=514 10-21=564 10-22=1015 10-23=964 10-24=293 10-25=12 10-26=4 10-27=1
+MonthlyActiveUsers [OneDay] 10-14=735 10-15=735 10-16=738 10-17=739 10-18=744 10-19=744 10-20=1248 10-21=1792 10-22=2783 10-23=3719 10-24=4005 10-25=4002 10-26=3946 10-27=3725
+Visits [OneDay] 10-14=1 10-15=4 10-16=18 10-17=2 10-18=6 10-19=3 10-20=568 10-21=622 10-22=1102 10-23=1048 10-24=329 10-25=13 10-26=4 10-27=2
+AverageSessionLengthMinutes [OneDay] 10-14=1.32 10-15=2.04 10-16=9.98 10-17=1.87 10-18=2.03 10-19=1.32 10-20=3.08 10-21=2.73 10-22=3.57 10-23=3.68 10-24=3.48 10-25=3.36 10-26=2.78 10-27=9.28
+AveragePlayTimeMinutesPerDAU [OneDay] 10-14=1.32 10-15=2.72 10-16=17.95 10-17=1.87 10-18=2.03 10-19=1.98 10-20=3.4 10-21=3.01 10-22=3.87 10-23=4 10-24=3.91 10-25=3.64 10-26=2.78 10-27=18.57
+TotalPlayTimeHours [OneDay] 10-14=0.02 10-15=0.14 10-16=2.99 10-17=0.06 10-18=0.2 10-19=0.07 10-20=29.17 10-21=28.3 10-22=65.53 10-23=64.27 10-24=19.11 10-25=0.73 10-26=0.19 10-27=0.31
+DauMauStickiness [OneDay] 10-14=0 10-15=0 10-16=0.01 10-17=0 10-18=0.01 10-19=0 10-20=0.41 10-21=0.31 10-22=0.37 10-23=0.26 10-24=0.07 10-25=0 10-26=0 10-27=0
+ForwardD1Retention [OneDay] 10-14=0 10-15=0 10-16=0 10-17=0 10-18=0 10-19=0 10-20=0.01 10-21=0.03 10-22=0.01 10-23=0.01 10-24=0 10-25=0 10-26=0
+ForwardD7Retention [OneDay] 10-14=0 10-15=0 10-16=0 10-17=0 10-18=0 10-19=0 10-20=0
+ForwardD30Retention [OneDay] aucune donnée
+SNOW CHASE relevé 28/10/2026 18:31:09 | partie 2/14 | * = provisoire
+UniqueUsersWithImpressions [OneDay] 10-14=184 10-15=145 10-16=172 10-17=187 10-18=226 10-19=691 10-20=85052 10-21=44836 10-22=58159 10-23=40841 10-24=13358 10-25=687 10-26=298 10-27=200
+UniqueUsersWithClicks [OneDay] 10-14=3 10-15=5 10-16=13 10-17=7 10-18=6 10-19=10 10-20=1236 10-21=956 10-22=1588 10-23=1298 10-24=428 10-25=29 10-26=9 10-27=5
+UniqueUsersWithPlaySessions [OneDay] 10-14=1 10-15=3 10-16=10 10-17=2 10-18=6 10-19=2 10-20=512 10-21=561 10-22=1011 10-23=961 10-24=292 10-25=12 10-26=4 10-27=1
+QualifiedUniqueUsersWithPlaySessions [OneDay] 10-14=0 10-15=1 10-16=6 10-17=1 10-18=1 10-19=0 10-20=132 10-21=158 10-22=386 10-23=337 10-24=119 10-25=3 10-26=1 10-27=1
+ImpressionCVR [OneDay] 10-14=0.02 10-15=0.04 10-16=0.08 10-17=0.04 10-18=0.04 10-19=0.03 10-20=0.1 10-21=0.06 10-22=0.07 10-23=0.06 10-24=0.05 10-25=0.04 10-26=0.03 10-27=0.03
+ClickCVR [OneDay] 10-14=0.33 10-15=0.2 10-16=0.38 10-17=0.14 10-18=0.33 10-19=0.5 10-20=0.43 10-21=0.51 10-22=0.52 10-23=0.41 10-24=0.41 10-25=0.31 10-26=0.33 10-27=0.2
+EndToEndCVR [OneDay] 10-14=0.01 10-15=0.02 10-16=0.03 10-17=0.01 10-18=0.02 10-19=0.02 10-20=0.07 10-21=0.04 10-22=0.05 10-23=0.03 10-24=0.02 10-25=0.01 10-26=0.01 10-27=0.01
+QualifiedEndToEndCVR [OneDay] 10-14=0 10-15=0.01 10-16=0.02 10-17=0 10-18=0 10-19=0 10-20=0.04 10-21=0.02 10-22=0.02 10-23=0.01 10-24=0.01 10-25=0 10-26=0 10-27=0.01
+RFYPlayThroughRate [OneDay] 10-15=0 10-20=0 10-22=0 10-23=0 10-24=0.14 10-25=0 10-26=0
+RFYDuration0To60 [OneDay] 10-24=1
+SNOW CHASE relevé 28/10/2026 18:31:30 | partie 3/14 | * = provisoire
+RFYDuration61To180 [OneDay] 10-24=0
+RFYD1Playtime [OneDay] 10-24=0
+RFYD2To7Playtime [OneDay] aucune donnée
+RFYD8To28Playtime [OneDay] aucune donnée
+RFYD2To7PlayDays [OneDay] aucune donnée
+RFYD1CoplayDays [OneDay] aucune donnée
+RFYD2To7CoplayDays [OneDay] aucune donnée
+RFYD1QualifiedPlaySessions [OneDay] 10-24=0
+RFYD1SpendDay [OneDay] 10-24=0
+DailyRevenue [OneDay] 10-14=0 10-15=14 10-16=0 10-17=0 10-18=0 10-19=0 10-20=217 10-21=7 10-22=0 10-23=0 10-24=0 10-25=0 10-26=0 10-27=0
+SNOW CHASE relevé 28/10/2026 18:31:51 | partie 4/14 | * = provisoire
+PayingUsers [OneDay] 10-14=0 10-15=1 10-16=0 10-17=0 10-18=0 10-19=0 10-20=1 10-21=1 10-22=0 10-23=0 10-24=0 10-25=0 10-26=0 10-27=0
+PayingUsersCVR [OneDay] 10-14=0 10-15=0.33 10-16=0 10-17=0 10-18=0 10-19=0 10-20=0 10-21=0 10-22=0 10-23=0 10-24=0 10-25=0 10-26=0 10-27=0
+AverageRevenuePerUser [OneDay] 10-14=0 10-15=4.67 10-16=0 10-17=0 10-18=0 10-19=0 10-20=0.42 10-21=0.01 10-22=0 10-23=0 10-24=0 10-25=0 10-26=0 10-27=0
+ThumbnailImpressions [OneDay] 10-22=14 10-23=2 10-24=7 10-25=5 10-26=18 10-27=13 10-28=0
+ThumbnailQualifiedPTR [OneDay] 10-22=0 10-23=0 10-24=0 10-25=0.2 10-26=0 10-27=0 10-28=0
+ThumbnailQualifiedPlays [OneDay] 10-22=0 10-23=0 10-24=0 10-25=1 10-26=0 10-27=0 10-28=0
+ThumbnailAverageSessionLengthMinutes [OneDay] 10-22=0 10-23=0 10-24=0 10-25=10.75 10-26=0 10-27=0 10-28=0
+SessionDurationSecondsP10 [OneDay] 10-14=79 10-15=107.67 10-16=585.89 10-17=77.2 10-18=123.33 10-19=94.25 10-20=212.08 10-21=180.72 10-22=256.06 10-23=230.32 10-24=173.55 10-25=235.18 10-26=167.75 10-27=145 10-28=187.5
+SessionDurationSecondsP50 [OneDay] 10-14=79 10-15=107.67 10-16=608.72 10-17=130 10-18=123.33 10-19=94.25 10-20=234.47 10-21=187.01 10-22=263.57 10-23=239.91 10-24=173.82 10-25=235.18 10-26=167.75 10-27=145 10-28=187.5
+SessionDurationSecondsP90 [OneDay] 10-14=79 10-15=107.67 10-16=631.55 10-17=182.8 10-18=123.33 10-19=94.25 10-20=256.86 10-21=197.08 10-22=271.08 10-23=249.53 10-24=174.1 10-25=235.18 10-26=167.75 10-27=145 10-28=187.5
+SNOW CHASE relevé 28/10/2026 18:32:12 | partie 5/14 | * = provisoire
+ClientCrashCount [OneDay] 10-20=1 10-21=1 10-22=1 10-23=8 10-24=8
+ServerCrashCount [OneDay] aucune donnée
+UniqueUsersWithImpressions [OneDay par AcquisitionSource] SponsoredAds=10-19=438 10-20=84034 10-21=43639 10-22=56769 10-23=39227 10-24=12105 10-25=8 10-26=1 10-27=3 | ContinueToPlay=10-14=36 10-15=39 10-16=50 10-17=54 10-18=50 10-19=31 10-20=418 10-21=693 10-22=1182 10-23=1396 10-24=1104 10-25=483 10-26=153 10-27=107 | SearchAds=10-19=123 10-20=689 10-21=683 10-22=702 10-23=564 10-24=85 | Search=10-14=148 10-15=105 10-16=115 10-17=129 10-18=175 10-19=101 10-20=120 10-21=137 10-22=142 10-23=261 10-24=270 10-25=191 10-26=129 10-27=84 | Friends=10-15=2 10-16=9 10-17=2 10-18=2 10-20=85 10-21=62 10-22=104 10-23=78 10-24=23 10-25=1 | Others=10-14=1 10-15=2 10-16=6 10-17=4 10-18=6 10-19=2 10-20=47 10-21=30 10-22=14 10-23=10 10-24=3 10-26=1 10-27=1 | HomeRecommendation=10-15=1 10-20=1 10-22=13 10-23=3 10-24=7 10-25=4 10-26=14 10-27=6 | Moments=10-16=1 10-19=1 10-20=1 10-24=1
+UniqueUsersWithClicks [OneDay par AcquisitionSource] SponsoredAds=10-19=3 10-20=1192 10-21=893 10-22=1503 10-23=1232 10-24=374 | ContinueToPlay=10-14=3 10-15=3 10-16=13 10-17=4 10-18=4 10-19=4 10-20=34 10-21=36 10-22=59 10-23=68 10-24=62 10-25=28 10-26=7 10-27=5 | SearchAds=10-19=3 10-20=29 10-21=42 10-22=49 10-23=19 10-24=3 | Search=10-15=2 10-17=2 10-18=2 10-20=2 10-21=1 10-22=8 10-23=2 10-24=5 10-25=1 10-26=2 | Others=10-17=1 10-22=1 10-23=2 | HomeRecommendation=10-24=1
+UniqueUsersWithPlaySessions [OneDay par AcquisitionSource] SponsoredAds=10-20=469 10-21=523 10-22=943 10-23=899 10-24=266 | ContinueToPlay=10-14=1 10-15=2 10-16=4 10-17=1 10-19=2 10-20=15 10-21=20 10-22=33 10-23=30 10-24=28 10-25=9 10-26=4 10-27=1 | Friends=10-16=2 10-18=2 10-20=27 10-21=15 10-22=33 10-23=27 10-24=5 | Others=10-15=1 10-16=5 10-17=1 10-18=2 10-20=13 10-21=19 10-22=23 10-23=30 10-24=7 10-25=3 | Search=10-15=1 10-16=1 10-18=2 10-20=1 10-22=3 10-24=1
+QualifiedUniqueUsersWithPlaySessions [OneDay par AcquisitionSource] SponsoredAds=10-20=109 10-21=135 10-22=353 10-23=310 10-24=105 | ContinueToPlay=10-14=0 10-15=1 10-16=3 10-17=0 10-19=0 10-20=9 10-21=12 10-22=13 10-23=11 10-24=12 10-25=1 10-26=1 10-27=1 | Friends=10-16=2 10-18=0 10-20=13 10-21=6 10-22=16 10-23=12 10-24=4 | Others=10-15=0 10-16=2 10-17=1 10-18=1 10-20=7 10-21=9 10-22=11 10-23=15 10-24=5 10-25=2 | Search=10-15=0 10-16=1 10-18=0 10-20=0 10-22=2 10-24=0
+PeakConcurrentPlayers [OneHour] 18h=1 19h=1 20h=1 21h=1 22h=1 23h=1 12h=1 13h=0.67 14h=0.67 15h=0.67 16h=0.67 17h=0.67
+SessionDurationSecondsAvg [OneHour] 19h=158.57 20h=126 21h=126 22h=126 23h=126 00h=126 01h=126 02h=126 03h=126 04h=126 05h=126 06h=126 07h=126 08h=126 12h=187.5 13h=308 14h=308 15h=308 16h=308 17h=308
+SessionDurationSecondsP50 [OneHour] 19h=158.57 20h=126 21h=126 22h=126 23h=126 00h=126 01h=126 02h=126 03h=126 04h=126 05h=126 06h=126 07h=126 08h=126 12h=187.5 13h=308 14h=308 15h=308 16h=308 17h=308
+ClientCrashRate15m [OneHour] 19h=0 20h=0
+SNOW CHASE relevé 28/10/2026 18:32:33 | partie 6/14 | * = provisoire
+ClientCrashCount [OneHour] aucune donnée
+OomUnexpectedExits [OneHour] aucune donnée
+ClientFpsAvg [OneHour] 18h=55.84 19h=50.38 20h=50.38 21h=50.38 22h=50.38 23h=50.38 00h=50.38 01h=50.38 02h=50.38 03h=50.38 04h=50.38 05h=50.38 06h=50.38 12h=57.73 13h=57.73 14h=57.73 15h=57.73 16h=57.73 17h=57.73
+ClientFpsP10 [OneHour] 18h=55.52 19h=50.32 20h=50.32 21h=50.32 22h=50.32 23h=50.32 00h=50.32 01h=50.32 02h=50.32 03h=50.32 04h=50.32 05h=50.32 06h=50.32 12h=57.49 13h=57.49 14h=57.49 15h=57.49 16h=57.49 17h=57.49
+ClientMemoryUsageAvg [OneHour] 18h=1439874333.33 19h=1499086250 20h=1499086250 21h=1499086250 22h=1499086250 23h=1499086250 00h=1499086250 01h=1499086250 02h=1499086250 03h=1499086250 04h=1499086250 05h=1499086250 06h=1499086250 12h=1112122959.18 13h=1112122959.18 14h=1112122959.18 15h=1112122959.18 16h=1112122959.18 17h=1112122959.18
+ClientMemoryUsageP90 [OneHour] 18h=1443301600 19h=1505684583.33 20h=1505684583.33 21h=1505684583.33 22h=1505684583.33 23h=1505684583.33 00h=1505684583.33 01h=1505684583.33 02h=1505684583.33 03h=1505684583.33 04h=1505684583.33 05h=1505684583.33 06h=1505684583.33 12h=1178447285.71 13h=1178447285.71 14h=1178447285.71 15h=1178447285.71 16h=1178447285.71 17h=1178447285.71
+ServerFrameRateAvg [OneHour] 19h=55.75 20h=57.82 21h=57.82 22h=57.82 23h=57.82 00h=57.82 01h=57.82 07h=40.04 08h=40.04 09h=40.04 10h=40.04 11h=40.04 12h=40.04 13h=48.67 14h=59.86 15h=59.86 16h=59.86 17h=59.86
+ServerCrashCount [OneHour] aucune donnée
+DailyActiveUsers [None par Country] BR=410 | US=351 | ID=284 | MX=186 | FR=116 | GB=110 | PH=107 | DE=106 | TH=105 | PL=64 | MY=54 | RO=51 | NL=45 | IT=44 | AR=39
+DailyActiveUsers [None par AgeGroupV2] Age21OrOver=2229 | Age18AndOverToUnder21=486 | Age16AndOverToUnder18=65 | AgeUnchecked=3 | Age9AndOverToUnder13=1
+SNOW CHASE relevé 28/10/2026 18:32:53 | partie 7/14 | * = provisoire
+DailyActiveUsers [None par Gender] Female=1412 | Male=1059 | Unknown=310
+DailyActiveUsers [None par Platform] Phone=1872 | Tablet=797 | Computer=117
+DailyActiveUsers [None par OperatingSystem] Android=1749 | iOS=919 | Windows=106 | OSX=10
+DailyActiveUsers [None par Locale] en_us=1010 | es_es=432 | pt_br=413 | id_id=268 | fr_fr=124 | ru_ru=103 | th_th=96 | de_de=93 | pl_pl=52 | it_it=41 | ja_jp=33 | tr_tr=30 | ar_001=25 | zh_tw=12 | ko_kr=10
+DailyActiveUsers [None par AcquisitionSource] SponsoredAds=2633 | Friends=85 | Others=59 | Search=5
+DailyActiveUsers [None par IsNewUser] New=2754 | Returning=82
+DailyActiveUsers [None par UserO18Eligibility] OtherUsers=2486 | EligibleO18Users=296
+DailyActiveUsers [None par UserSegmentationEngagementLevel] Low=2765 | Medium=71 | High=4
+DailyActiveUsers [None par UserSegmentationAccountAge] AccountAge1To30Days=2787 | AccountAge31To90Days=2
+DailyActiveUsers [None par UserSegmentationPayerStatus] NeverPayer=2777 | ActiveMediumPayer=4 | ActiveHighPayer=3 | ActiveLowPayer=2 | LapsedPayer=1
+SNOW CHASE relevé 28/10/2026 18:33:14 | partie 8/14 | * = provisoire
+Visits [None par Country] BR=449 | US=390 | ID=310 | MX=203 | FR=146 | PH=122 | TH=119 | DE=115 | GB=112 | PL=69 | MY=64 | RO=59 | IT=52 | NL=47 | AR=43
+Visits [None par Platform] Phone=2076 | Tablet=872 | Computer=172
+Visits [None par AgeGroupV2] Age21OrOver=2507 | Age18AndOverToUnder21=539 | Age16AndOverToUnder18=69 | AgeUnchecked=3 | Age9AndOverToUnder13=2
+Visits [None par Gender] Female=1547 | Male=1236 | Unknown=337
+Visits [None par IsNewUser] New=2985 | Returning=135
+AverageSessionLengthMinutes [None par AgeGroupV2] AgeUnchecked=4.51 | Age18AndOverToUnder21=3.52 | Age21OrOver=3.43 | Age9AndOverToUnder13=3.29 | Age16AndOverToUnder18=2.61
+AverageSessionLengthMinutes [None par Platform] Computer=3.84 | Tablet=3.57 | Phone=3.34
+AverageSessionLengthMinutes [None par Country] SG=30.17 | ZA=18.61 | FJ=17.95 | KH=8.02 | NG=7.53 | GP=7.43 | BA=7.02 | AT=5.99 | AZ=5.93 | AE=5.6 | KG=5.37 | BY=5.32 | BE=5.3 | MD=4.9 | AR=4.87
+AverageSessionLengthMinutes [None par IsNewUser] New=3.43 | Returning=3.41
+AverageSessionLengthMinutes [None par Gender] Female=3.47 | Unknown=3.4 | Male=3.39
+SNOW CHASE relevé 28/10/2026 18:33:34 | partie 9/14 | * = provisoire
+AverageSessionLengthMinutes [None par OperatingSystem] Windows=3.75 | Android=3.57 | OSX=3.19 | iOS=3.12
+AverageSessionLengthMinutes [None par Locale] pt_pt=8.9 | en_gb=5.94 | tr_tr=4.43 | fr_fr=4.34 | zh_cn=4.01 | id_id=3.84 | pt_br=3.66 | es_es=3.65 | de_de=3.33 | ru_ru=3.32 | en_us=3.28 | zh_tw=3.02 | ko_kr=2.92 | ja_jp=2.82 | th_th=2.69
+AveragePlayTimeMinutesPerDAU [None par AgeGroupV2] Age9AndOverToUnder13=6.58 | AgeUnchecked=4.51 | Age18AndOverToUnder21=3.9 | Age21OrOver=3.86 | Age16AndOverToUnder18=2.77
+AveragePlayTimeMinutesPerDAU [None par Platform] Computer=5.65 | Tablet=3.91 | Phone=3.7
+AveragePlayTimeMinutesPerDAU [None par Country] SG=30.17 | ZA=18.61 | FJ=17.95 | LV=13.63 | MO=8.47 | KH=8.02 | BY=7.98 | DO=7.96 | NG=7.53 | AT=7.49 | GP=7.43 | BA=7.02 | BE=6.18 | AZ=5.93 | AE=5.6
+AveragePlayTimeMinutesPerDAU [None par IsNewUser] Returning=5.61 | New=3.72
+TotalPlayTimeHours [None par Country] BR=27.44 | US=24.11 | ID=20.14 | MX=13.18 | FR=10.46 | PH=5.98 | DE=5.92 | TH=5.75 | GB=5.07 | AR=3.49 | MY=2.83 | RO=2.6 | NL=2.57 | BE=2.47 | ES=2.31
+TotalPlayTimeHours [None par Platform] Phone=115.54 | Tablet=51.88 | Computer=11.02
+TotalPlayTimeHours [None par AgeGroupV2] Age21OrOver=143.49 | Age18AndOverToUnder21=31.62 | Age16AndOverToUnder18=3 | AgeUnchecked=0.23 | Age9AndOverToUnder13=0.11
+UniqueUsersWithImpressions [None par AcquisitionSource] SponsoredAds=146670 | ContinueToPlay=2854 | SearchAds=2024 | Search=1178 | Friends=251 | Others=53 | HomeRecommendation=44 | Moments=1
+SNOW CHASE relevé 28/10/2026 18:33:55 | partie 10/14 | * = provisoire
+UniqueUsersWithImpressions [None par AgeGroupV2] Age21OrOver=102616 | Age18AndOverToUnder21=29834 | Age16AndOverToUnder18=18163 | AgeUnchecked=91 | Age13AndOverToUnder16=51 | Age9AndOverToUnder13=39 | AgeUnder9=12
+UniqueUsersWithImpressions [None par Gender] Female=71763 | Male=64120 | Unknown=14274
+UniqueUsersWithImpressions [None par Platform] Phone=87281 | Tablet=41443 | Computer=21511 | RAQI_RESERVED_DIMENSION_VALUES_UNKNOWN=8 | VR=3
+UniqueUsersWithImpressions [None par OperatingSystem] Android=80350 | iOS=48628 | Windows=19675 | OSX=1588 | Unknown=10
+UniqueUsersWithImpressions [None par IsNewUser] New=150213 | Returning=2938
+UniqueUsersWithClicks [None par AcquisitionSource] SponsoredAds=3988 | ContinueToPlay=227 | SearchAds=113 | Search=18 | Others=3 | HomeRecommendation=1
+UniqueUsersWithClicks [None par AgeGroupV2] Age21OrOver=3144 | Age18AndOverToUnder21=798 | Age16AndOverToUnder18=226 | AgeUnchecked=3 | Age9AndOverToUnder13=2
+UniqueUsersWithClicks [None par Gender] Female=2110 | Male=1632 | Unknown=430
+UniqueUsersWithClicks [None par Platform] Phone=2834 | Tablet=1201 | Computer=141
+UniqueUsersWithPlaySessions [None par AcquisitionSource] SponsoredAds=2627 | ContinueToPlay=109 | Friends=80 | Others=78 | Search=4
+SNOW CHASE relevé 28/10/2026 18:34:16 | partie 11/14 | * = provisoire
+UniqueUsersWithPlaySessions [None par AgeGroupV2] Age21OrOver=2217 | Age18AndOverToUnder21=485 | Age16AndOverToUnder18=65 | AgeUnchecked=3 | Age9AndOverToUnder13=1
+UniqueUsersWithPlaySessions [None par Gender] Female=1406 | Male=1054 | Unknown=310
+UniqueUsersWithPlaySessions [None par Platform] Phone=1864 | Tablet=794 | Computer=117
+UniqueUsersWithPlaySessions [None par OperatingSystem] Android=1740 | iOS=918 | Windows=106 | OSX=10
+UniqueUsersWithPlaySessions [None par IsNewUser] New=2741 | Returning=171
+UniqueUsersWithPlaySessions [None par FunnelSource] RAQI_RESERVED_DIMENSION_VALUES_UNKNOWN=2658 | Clicks=159
+QualifiedUniqueUsersWithPlaySessions [None par AcquisitionSource] SponsoredAds=901 | ContinueToPlay=49 | Others=40 | Friends=38 | Search=2
+QualifiedUniqueUsersWithPlaySessions [None par AgeGroupV2] Age21OrOver=795 | Age18AndOverToUnder21=171 | Age16AndOverToUnder18=21 | Age9AndOverToUnder13=1 | AgeUnchecked=1
+QualifiedUniqueUsersWithPlaySessions [None par Platform] Phone=641 | Tablet=310 | Computer=39
+QualifiedUniqueUsersWithPlaySessions [None par FunnelSource] RAQI_RESERVED_DIMENSION_VALUES_UNKNOWN=928 | Clicks=80
+SNOW CHASE relevé 28/10/2026 18:34:36 | partie 12/14 | * = provisoire
+ImpressionCVR [None par AcquisitionSource] Friends=0.32 | ContinueToPlay=0.08 | Others=0.06 | HomeRecommendation=0.02 | Search=0.02 | Moments=0
+ImpressionCVR [None par AgeGroupV2] Age21OrOver=0.08 | Age18AndOverToUnder21=0.07 | Age16AndOverToUnder18=0.06 | Age9AndOverToUnder13=0.04 | AgeUnchecked=0.02 | AgeUnder9=0 | Age13AndOverToUnder16=0
+ImpressionCVR [None par Platform] Phone=0.08 | Computer=0.07 | Tablet=0.06 | VR=0 | RAQI_RESERVED_DIMENSION_VALUES_UNKNOWN=0
+ClickCVR [None par AcquisitionSource] Others=0.67 | ContinueToPlay=0.47 | Search=0.22 | HomeRecommendation=0
+ClickCVR [None par AgeGroupV2] Age9AndOverToUnder13=1 | AgeUnchecked=1 | Age21OrOver=0.48 | Age18AndOverToUnder21=0.4 | Age16AndOverToUnder18=0.31
+ClickCVR [None par Platform] Tablet=0.53 | Computer=0.48 | Phone=0.43
+EndToEndCVR [None par AcquisitionSource] Friends=0.32 | ContinueToPlay=0.04 | Others=0.04 | Search=0 | HomeRecommendation=0 | Moments=0
+EndToEndCVR [None par AgeGroupV2] Age21OrOver=0.05 | Age16AndOverToUnder18=0.04 | Age9AndOverToUnder13=0.04 | Age18AndOverToUnder21=0.04 | AgeUnchecked=0.02 | AgeUnder9=0 | Age13AndOverToUnder16=0
+EndToEndCVR [None par Platform] Computer=0.05 | Phone=0.05 | Tablet=0.04 | VR=0 | RAQI_RESERVED_DIMENSION_VALUES_UNKNOWN=0
+TotalSessionsEndedInBucket [None par SessionTimeBucket] 0=2754 | 30=2483 | 60=2044 | 90=1656 | 120=1344 | 150=1125 | 180=941 | 210=796 | 240=692 | 270=615 | 300=530 | 330=476 | 360=431 | 390=389 | 420=355
+SNOW CHASE relevé 28/10/2026 18:34:57 | partie 13/14 | * = provisoire
+PeakConcurrentPlayers [None par Platform] ERR 2001 Query Validation Errors: Query Error: Granularity None is not supported for metric PeakConcurrentPlayers.
+PeakConcurrentPlayers [None par OperatingSystem] ERR 2001 Query Validation Errors: Query Error: Granularity None is not supported for metric PeakConcurrentPlayers.
+SessionDurationSecondsP50 [None par Platform] ERR 2001 Query Validation Errors: Query Error: Granularity None is not supported for metric SessionDurationSecondsP50.
+SessionDurationSecondsP50 [None par OperatingSystem] ERR 2001 Query Validation Errors: Query Error: Granularity None is not supported for metric SessionDurationSecondsP50.
+ThumbnailImpressions [None par ThumbnailAsset] 128910922376135=42 | 80737459912208=15 | 132335383758249=2 | 98637609328368=0
+ThumbnailQualifiedPTR [None par ThumbnailAsset] 128910922376135=0.02 | 80737459912208=0 | 98637609328368=0 | 132335383758249=0
+ForwardD1Retention [OneDay par Platform] Computer=10-21=0.05 10-22=0.05 10-23=0 10-24=0 10-25=0 10-26=0 | Phone=10-21=0.02 10-22=0.01 10-23=0.01 10-24=0 10-25=0 10-26=0 | Tablet=10-21=0.02 10-22=0.01 10-23=0.01 10-24=0 10-25=0
+ForwardD1Retention [OneDay par AgeGroupV2] Age21OrOver=10-21=0.03 10-22=0.01 10-23=0.01 10-24=0 10-25=0 10-26=0 | Age18AndOverToUnder21=10-21=0.03 10-22=0.01 10-23=0.01 10-24=0 10-25=0 | Age9AndOverToUnder13=10-21=0 10-22=0 10-23=0 | Age16AndOverToUnder18=10-21=0 10-22=0 10-23=0 10-24=0 | AgeUnchecked=10-21=0 10-22=0 10-23=0 10-24=0 10-25=0
+ForwardD1Retention [OneDay par Country] PK=10-21=1 10-22=0 10-23=0 | IT=10-21=0.07 10-22=0.08 10-23=0 10-24=0.5 10-25=0 | BY=10-21=0 10-22=0 10-23=0.5 10-24=0 | HR=10-21=0 10-22=0.33 10-23=0 | DO=10-21=0 10-22=0.33 10-23=0 10-24=0 | MN=10-21=0.33 10-22=0 10-23=0 10-24=0 | AU=10-21=0.2 10-22=0 10-23=0 10-24=0 10-25=0 | FR=10-21=0.08 10-22=0.03 10-23=0.02 10-24=0 | CA=10-21=0.13 10-22=0 10-23=0 | ES=10-21=0.11 10-22=0 10-23=0 10-24=0 10-25=0 | BE=10-21=0 10-22=0 10-23=0.08 10-24=0 | JP=10-21=0 10-22=0 10-23=0.08 10-24=0 | RO=10-21=0.08 10-22=0 10-23=0 10-24=0 10-25=0 | PL=10-21=0 10-22=0.07 10-23=0 10-24=0 | RU=10-21=0 10-22=0.07 10-23=0 10-24=0 | UA=10-21=0.06 10-22=0 10-23=0 | BR=10-21=0.02 10-22=0.02 10-23=0.02 10-24=0 10-25=0 10-26=0 | ID=10-21=0.04 10-22=0.01 10-23=0 10-24=0 | MY=10-21=0 10-22=0.04 10-23=0 10-24=0 | US=10-21=0.02 10-22=0.01 10-23=0 10-24=0 10-25=0 | DE=10-21=0 10-22=0 10-23=0.02 10-24=0 10-25=0 | AL=10-21=0 | DZ=10-21=0 10-22=0 | AZ=10-21=0 10-22=0 10-23=0 | AR=10-21=0 10-22=0 10-23=0 10-24=0 | AT=10-21=0 10-22=0 10-23=0 | BS=10-22=0 10-23=0 | BH=10-21=0 | BO=10-21=0 10-22=0 10-23=0 | BA=10-21=0 10-22=0 10-23=0 | BW=10-21=0 | BZ=10-22=0 10-23=0 | BG=10-21=0 10-22=0 10-23=0 | MM=10-21=0 10-22=0 | KH=10-21=0 10-22=0 | CL=10-21=0 10-22=0 10-23=0 10-24=0 | TW=10-21=0 10-22=0 10-23=0 10-24=0 | CO=10-21=0 10-22=0 10-23=0 10-24=0 | CR=10-21=0 10-22=0 10-23=0 10-24=0 | CZ=10-21=0 10-22=0 10-23=0 10-24=0 | DK=10-21=0 10-22=0 10-23=0 | EC=10-21=0 10-22=0 10-23=0 10-24=0 | SV=10-21=0 10-22=0 10-23=0 10-24=0 | EE=10-22=0 10-23=0 | FJ=10-22=0 10-23=0 | FI=10-21=0 10-22=0 10-23=0 | GA=10-22=0 10-23=0 | GE=10-21=0 | GR=10-21=0 10-22=0 10-23=0 | GP=10-21=0 10-22=0 | GU=10-21=0 10-22=0 | GT=10-21=0 10-22=0 10-23=0 10-26=0 | HN=10-21=0 10-22=0 10-23=0 10-24=0 | HK=10-21=0 10-22=0 10-23=0 10-24=0 | HU=10-21=0 10-22=0 10-23=0 | IS=10-22=0 10-23=0 | IN=10-21=0 10-22=0 10-23=0 10-24=0 | IR=10-21=0 | IQ=10-21=0 10-22=0 10-23=0 | IE=10-21=0 10-22=0 10-23=0 | IL=10-21=0 10-22=0 10-23=0 | JM=10-21=0 10-22=0 10-23=0 10-24=0 | KZ=10-21=0 10-22=0 10-23=0 10-24=0 10-25=0 10-26=0 | JO=10-21=0 10-22=0 | KE=10-21=0 10-22=0 10-23=0 | KR=10-21=0 10-22=0 10-23=0 10-24=0 | KW=10-21=0 10-22=0 | KG=10-21=0 10-22=0 10-23=0 | LV=10-21=0 10-22=0 10-25=0 10-26=0 | LT=10-21=0 10-22=0 10-23=0 10-24=0 | MO=10-22=0 10-23=0 10-24=0 | MX=10-21=0 10-22=0 10-23=0 10-24=0 | MD=10-21=0 10-22=0 10-23=0 | MA=10-21=0 10-22=0 | NR=10-22=0 10-23=0 | NP=10-21=0 10-22=0 | NL=10-21=0 10-22=0 10-23=0 10-24=0 10-25=0 | AW=10-23=0 10-24=0 | NZ=10-21=0 10-22=0 10-23=0 10-24=0 | NI=10-21=0 10-22=0 | NG=10-21=0 10-22=0 | NO=10-21=0 10-22=0 10-23=0 10-24=0 10-25=0 | PA=10-21=0 10-23=0 10-24=0 | PY=10-21=0 10-22=0 10-23=0 | PE=10-21=0 10-22=0 10-23=0 10-24=0 | PH=10-21=0 10-22=0 10-23=0 10-24=0 | PT=10-21=0 10-22=0 10-23=0 | PR=10-21=0 10-22=0 10-23=0 | RE=10-23=0 10-24=0 | SA=10-21=0 10-22=0 10-23=0 | SN=10-21=0 10-22=0 | RS=10-21=0 10-22=0 10-23=0 | SG=10-22=0 10-23=0 | SK=10-21=0 10-22=0 10-23=0 | VN=10-21=0 10-22=0 | SI=10-22=0 10-23=0 | ZA=10-21=0 10-22=0 | SR=10-21=0 10-22=0 | SE=10-21=0 10-22=0 10-23=0 10-24=0 | CH=10-21=0 10-22=0 10-23=0 | TH=10-21=0 10-22=0 10-23=0 10-24=0 10-25=0 10-26=0 | TT=10-21=0 10-22=0 10-23=0 | AE=10-21=0 10-22=0 10-23=0 10-24=0 | TR=10-21=0 10-22=0 | UG=10-22=0 10-23=0 | GB=10-21=0 10-22=0 10-23=0 | UY=10-21=0 10-22=0 10-23=0 10-24=0 | UZ=10-21=0 10-22=0 10-23=0 | VE=10-21=0 10-22=0 10-23=0 10-24=0
+ForwardD1Retention [OneDay par AcquisitionSource] Others=10-21=0.09 10-22=0.08 10-23=0 10-24=0 10-25=0 | SponsoredAds=10-21=0.02 10-22=0.01 10-23=0.01 10-24=0 10-25=0 10-26=0 | Search=10-21=0 10-22=0 10-23=0 10-24=0 | Friends=10-21=0 10-22=0 10-23=0 10-24=0 10-25=0 10-26=0
+SNOW CHASE relevé 28/10/2026 18:35:17 | partie 14/14 | * = provisoire
+RFYPlayThroughRate [OneDay par AgeGroupV2] Age18AndOverToUnder21=10-22=0 10-24=1 10-25=0 10-26=0 | Age16AndOverToUnder18=10-22=0 10-23=0 | Age21OrOver=10-22=0 10-23=0 10-24=0 10-25=0 10-26=0
+RFYPlayThroughRate [OneDay par Gender] Female=10-24=0.25 10-25=0 10-26=0 | Unknown=10-22=0 10-24=0 10-25=0 | Male=10-22=0 10-23=0 10-24=0 10-25=0 10-26=0
+RFYDuration0To60 [OneDay par AgeGroupV2] Age18AndOverToUnder21=10-24=1
+RFYDuration0To60 [OneDay par Gender] Female=10-24=1
