@@ -1,4 +1,4 @@
-SNOW CHASE relevé 02/11/2026 14:01:06 | partie 1/14 | * = provisoire
+SNOW CHASE relevé 02/11/2026 14:30:49 | partie 1/14 | * = provisoire
 DailyActiveUsers [OneDay] 10-19=2 10-20=514 10-21=564 10-22=1015 10-23=964 10-24=293 10-25=12 10-26=4 10-27=1 10-28=2 10-29=2 10-30=2 10-31=2
 MonthlyActiveUsers [OneDay] 10-19=744 10-20=1248 10-21=1796 10-22=2785 10-23=3732 10-24=4018 10-25=4014 10-26=3961 10-27=3743 10-28=3563 10-29=3535 10-30=3500 10-31=3477
 Visits [OneDay] 10-19=3 10-20=568 10-21=622 10-22=1102 10-23=1048 10-24=329 10-25=13 10-26=4 10-27=2 10-28=2 10-29=2 10-30=2 10-31=2
@@ -9,7 +9,7 @@ DauMauStickiness [OneDay] 10-19=0 10-20=0.41 10-21=0.31 10-22=0.36 10-23=0.26 10
 ForwardD1Retention [OneDay] 10-19=0 10-20=0.01 10-21=0.03 10-22=0.01 10-23=0.01 10-24=0 10-25=0 10-26=0 10-27=0 10-28=0 10-29=0 10-30=0
 ForwardD7Retention [OneDay] 10-19=0 10-20=0 10-21=0 10-22=0 10-23=0 10-24=0
 ForwardD30Retention [OneDay] aucune donnée
-SNOW CHASE relevé 02/11/2026 14:01:26 | partie 2/14 | * = provisoire
+SNOW CHASE relevé 02/11/2026 14:31:11 | partie 2/14 | * = provisoire
 UniqueUsersWithImpressions [OneDay] 10-19=691 10-20=85052 10-21=44836 10-22=58159 10-23=40841 10-24=13358 10-25=687 10-26=298 10-27=200 10-28=200 10-29=215 10-30=170 10-31=206
 UniqueUsersWithClicks [OneDay] 10-19=10 10-20=1236 10-21=956 10-22=1588 10-23=1298 10-24=428 10-25=29 10-26=9 10-27=5 10-28=7 10-29=5 10-30=4 10-31=10
 UniqueUsersWithPlaySessions [OneDay] 10-19=2 10-20=512 10-21=561 10-22=1011 10-23=961 10-24=292 10-25=12 10-26=4 10-27=1 10-28=2 10-29=2 10-30=2 10-31=2
@@ -20,7 +20,7 @@ EndToEndCVR [OneDay] 10-19=0.02 10-20=0.07 10-21=0.04 10-22=0.05 10-23=0.03 10-2
 QualifiedEndToEndCVR [OneDay] 10-19=0 10-20=0.04 10-21=0.02 10-22=0.02 10-23=0.01 10-24=0.01 10-25=0 10-26=0 10-27=0.01 10-28=0.01 10-29=0 10-30=0.01 10-31=0
 RFYPlayThroughRate [OneDay] 10-20=0 10-22=0 10-23=0 10-24=0.14 10-25=0 10-26=0 10-27=0 10-28=0 10-29=0 10-30=0 10-31=0
 RFYDuration0To60 [OneDay] 10-24=1
-SNOW CHASE relevé 02/11/2026 14:01:47 | partie 3/14 | * = provisoire
+SNOW CHASE relevé 02/11/2026 14:31:35 | partie 3/14 | * = provisoire
 RFYDuration61To180 [OneDay] 10-24=0
 RFYD1Playtime [OneDay] 10-24=0
 RFYD2To7Playtime [OneDay] 10-30=10.75
@@ -31,7 +31,7 @@ RFYD2To7CoplayDays [OneDay] 10-30=0
 RFYD1QualifiedPlaySessions [OneDay] 10-24=0
 RFYD1SpendDay [OneDay] 10-24=0
 DailyRevenue [OneDay] 10-19=0 10-20=217 10-21=7 10-22=0 10-23=0 10-24=0 10-25=0 10-26=0 10-27=0 10-28=0 10-29=0 10-30=0 10-31=0
-SNOW CHASE relevé 02/11/2026 14:02:09 | partie 4/14 | * = provisoire
+SNOW CHASE relevé 02/11/2026 14:31:57 | partie 4/14 | * = provisoire
 PayingUsers [OneDay] 10-19=0 10-20=1 10-21=1 10-22=0 10-23=0 10-24=0 10-25=0 10-26=0 10-27=0 10-28=0 10-29=0 10-30=0 10-31=0
 PayingUsersCVR [OneDay] 10-19=0 10-20=0 10-21=0 10-22=0 10-23=0 10-24=0 10-25=0 10-26=0 10-27=0 10-28=0 10-29=0 10-30=0 10-31=0
 AverageRevenuePerUser [OneDay] 10-19=0 10-20=0.42 10-21=0.01 10-22=0 10-23=0 10-24=0 10-25=0 10-26=0 10-27=0 10-28=0 10-29=0 10-30=0 10-31=0
@@ -42,7 +42,7 @@ ThumbnailAverageSessionLengthMinutes [OneDay] 10-22=0 10-23=0 10-24=0 10-25=10.7
 SessionDurationSecondsP10 [OneDay] ERR 2001 Query is not available for Universe with id 10767392366
 SessionDurationSecondsP50 [OneDay] ERR 2001 Query is not available for Universe with id 10767392366
 SessionDurationSecondsP90 [OneDay] ERR 2001 Query is not available for Universe with id 10767392366
-SNOW CHASE relevé 02/11/2026 14:02:29 | partie 5/14 | * = provisoire
+SNOW CHASE relevé 02/11/2026 14:32:18 | partie 5/14 | * = provisoire
 ClientCrashCount [OneDay] ERR 2001 Query is not available for Universe with id 10767392366
 ServerCrashCount [OneDay] aucune donnée
 UniqueUsersWithImpressions [OneDay par AcquisitionSource] SponsoredAds=10-19=438 10-20=84034 10-21=43639 10-22=56769 10-23=39227 10-24=12105 10-25=8 10-26=1 10-27=3 10-28=4 10-29=2 10-30=1 10-31=1 | ContinueToPlay=10-19=31 10-20=418 10-21=693 10-22=1182 10-23=1396 10-24=1104 10-25=483 10-26=153 10-27=107 10-28=99 10-29=100 10-30=86 10-31=116 | SearchAds=10-19=123 10-20=689 10-21=683 10-22=702 10-23=564 10-24=85 | Search=10-19=101 10-20=120 10-21=137 10-22=142 10-23=261 10-24=270 10-25=191 10-26=129 10-27=84 10-28=95 10-29=107 10-30=74 10-31=82 | Friends=10-20=85 10-21=62 10-22=104 10-23=78 10-24=23 10-25=1 | Others=10-19=2 10-20=47 10-21=30 10-22=14 10-23=10 10-24=3 10-26=1 10-27=1 10-28=3 10-29=1 10-30=2 10-31=6 | HomeRecommendation=10-20=1 10-22=13 10-23=3 10-24=7 10-25=4 10-26=14 10-27=6 10-28=1 10-29=5 10-30=6 10-31=1 | Moments=10-19=1 10-20=1 10-24=1 10-30=1 10-31=2
@@ -53,7 +53,7 @@ PeakConcurrentPlayers [OneHour] ERR 2001 Query is not available for Universe wit
 SessionDurationSecondsAvg [OneHour] ERR 2001 Query is not available for Universe with id 10767392366
 SessionDurationSecondsP50 [OneHour] ERR 2001 Query is not available for Universe with id 10767392366
 ClientCrashRate15m [OneHour] ERR 2001 Query is not available for Universe with id 10767392366
-SNOW CHASE relevé 02/11/2026 14:02:50 | partie 6/14 | * = provisoire
+SNOW CHASE relevé 02/11/2026 14:32:38 | partie 6/14 | * = provisoire
 ClientCrashCount [OneHour] ERR 2001 Query is not available for Universe with id 10767392366
 OomUnexpectedExits [OneHour] ERR 2001 Query is not available for Universe with id 10767392366
 ClientFpsAvg [OneHour] ERR 2001 Query is not available for Universe with id 10767392366
@@ -64,7 +64,7 @@ ServerFrameRateAvg [OneHour] ERR 2001 Query is not available for Universe with i
 ServerCrashCount [OneHour] aucune donnée
 DailyActiveUsers [None par Country] BR=1 | DE=1 | GT=1 | ID=1 | KZ=1 | LV=1 | LY=1 | NL=1 | SE=1 | TH=1
 DailyActiveUsers [None par AgeGroupV2] Age21OrOver=9 | Age18AndOverToUnder21=1
-SNOW CHASE relevé 02/11/2026 14:03:10 | partie 7/14 | * = provisoire
+SNOW CHASE relevé 02/11/2026 14:32:59 | partie 7/14 | * = provisoire
 DailyActiveUsers [None par Gender] Unknown=4 | Male=4 | Female=2
 DailyActiveUsers [None par Platform] Phone=7 | Tablet=2 | Computer=1
 DailyActiveUsers [None par OperatingSystem] Android=5 | iOS=4 | Windows=1
@@ -75,7 +75,7 @@ DailyActiveUsers [None par UserO18Eligibility] OtherUsers=10
 DailyActiveUsers [None par UserSegmentationEngagementLevel] Medium=6 | Low=4 | High=2
 DailyActiveUsers [None par UserSegmentationAccountAge] AccountAge1To30Days=10
 DailyActiveUsers [None par UserSegmentationPayerStatus] NeverPayer=9 | LapsedPayer=1
-SNOW CHASE relevé 02/11/2026 14:03:31 | partie 8/14 | * = provisoire
+SNOW CHASE relevé 02/11/2026 14:33:19 | partie 8/14 | * = provisoire
 Visits [None par Country] DE=4 | GT=2 | BR=1 | ID=1 | KZ=1 | LV=1 | LY=1 | NL=1 | SE=1 | TH=1
 Visits [None par Platform] Phone=11 | Tablet=2 | Computer=1
 Visits [None par AgeGroupV2] Age21OrOver=13 | Age18AndOverToUnder21=1
@@ -86,7 +86,7 @@ AverageSessionLengthMinutes [None par Platform] Phone=3.55 | Computer=2.73 | Tab
 AverageSessionLengthMinutes [None par Country] GT=9.28 | TH=5.95 | LY=5.13 | ID=3.43 | LV=2.73 | NL=2.25 | SE=1.55 | BR=1.42 | KZ=1.03 | DE=0.88
 AverageSessionLengthMinutes [None par IsNewUser] New=3.34 | Returning=3.24
 AverageSessionLengthMinutes [None par Gender] Female=5.54 | Unknown=3.24 | Male=2.15
-SNOW CHASE relevé 02/11/2026 14:03:51 | partie 9/14 | * = provisoire
+SNOW CHASE relevé 02/11/2026 14:33:40 | partie 9/14 | * = provisoire
 AverageSessionLengthMinutes [None par OperatingSystem] Android=5.02 | Windows=2.73 | iOS=1.82
 AverageSessionLengthMinutes [None par Locale] es_es=9.28 | th_th=5.95 | ar_001=5.13 | id_id=3.43 | nl_nl=2.25 | en_us=2.14 | pt_br=1.42 | ru_ru=1.03 | tr_tr=0.88
 AveragePlayTimeMinutesPerDAU [None par AgeGroupV2] Age18AndOverToUnder21=5.13 | Age21OrOver=4.5
@@ -97,7 +97,7 @@ TotalPlayTimeHours [None par Country] GT=0.31 | TH=0.1 | LY=0.09 | DE=0.06 | ID=
 TotalPlayTimeHours [None par Platform] Phone=0.65 | Tablet=0.06 | Computer=0.05
 TotalPlayTimeHours [None par AgeGroupV2] Age21OrOver=0.67 | Age18AndOverToUnder21=0.09
 UniqueUsersWithImpressions [None par AcquisitionSource] Search=557 | ContinueToPlay=481 | HomeRecommendation=33 | Others=13 | SponsoredAds=12 | Moments=2
-SNOW CHASE relevé 02/11/2026 14:04:12 | partie 10/14 | * = provisoire
+SNOW CHASE relevé 02/11/2026 14:34:01 | partie 10/14 | * = provisoire
 UniqueUsersWithImpressions [None par AgeGroupV2] Age21OrOver=647 | Age18AndOverToUnder21=248 | Age16AndOverToUnder18=194 | Age9AndOverToUnder13=1 | AgeUnchecked=1
 UniqueUsersWithImpressions [None par Gender] Male=552 | Female=420 | Unknown=118
 UniqueUsersWithImpressions [None par Platform] Phone=563 | Tablet=287 | Computer=247 | VR=1 | RAQI_RESERVED_DIMENSION_VALUES_UNKNOWN=1
@@ -108,7 +108,7 @@ UniqueUsersWithClicks [None par AgeGroupV2] Age21OrOver=24 | Age18AndOverToUnder
 UniqueUsersWithClicks [None par Gender] Male=16 | Female=14 | Unknown=5
 UniqueUsersWithClicks [None par Platform] Phone=23 | Tablet=10 | Computer=3
 UniqueUsersWithPlaySessions [None par AcquisitionSource] ContinueToPlay=8 | Search=2
-SNOW CHASE relevé 02/11/2026 14:04:32 | partie 11/14 | * = provisoire
+SNOW CHASE relevé 02/11/2026 14:34:21 | partie 11/14 | * = provisoire
 UniqueUsersWithPlaySessions [None par AgeGroupV2] Age21OrOver=9 | Age18AndOverToUnder21=1
 UniqueUsersWithPlaySessions [None par Gender] Unknown=4 | Male=4 | Female=2
 UniqueUsersWithPlaySessions [None par Platform] Phone=7 | Tablet=2 | Computer=1
@@ -119,7 +119,7 @@ QualifiedUniqueUsersWithPlaySessions [None par AcquisitionSource] ContinueToPlay
 QualifiedUniqueUsersWithPlaySessions [None par AgeGroupV2] Age21OrOver=3 | Age18AndOverToUnder21=1
 QualifiedUniqueUsersWithPlaySessions [None par Platform] Phone=4 | Tablet=0 | Computer=0
 QualifiedUniqueUsersWithPlaySessions [None par FunnelSource] RAQI_RESERVED_DIMENSION_VALUES_UNKNOWN=4 | Clicks=0
-SNOW CHASE relevé 02/11/2026 14:04:53 | partie 12/14 | * = provisoire
+SNOW CHASE relevé 02/11/2026 14:34:42 | partie 12/14 | * = provisoire
 ImpressionCVR [None par AcquisitionSource] Others=0.15 | ContinueToPlay=0.05 | Search=0.02 | HomeRecommendation=0 | Moments=0
 ImpressionCVR [None par AgeGroupV2] Age21OrOver=0.04 | Age16AndOverToUnder18=0.03 | Age18AndOverToUnder21=0.02 | Age9AndOverToUnder13=0 | AgeUnchecked=0
 ImpressionCVR [None par Platform] Phone=0.04 | Tablet=0.03 | Computer=0.02 | VR=0 | RAQI_RESERVED_DIMENSION_VALUES_UNKNOWN=0
@@ -130,7 +130,7 @@ EndToEndCVR [None par AcquisitionSource] ContinueToPlay=0.02 | Search=0 | HomeRe
 EndToEndCVR [None par AgeGroupV2] Age21OrOver=0.01 | Age18AndOverToUnder21=0 | Age9AndOverToUnder13=0 | Age16AndOverToUnder18=0 | AgeUnchecked=0
 EndToEndCVR [None par Platform] Phone=0.01 | Tablet=0.01 | Computer=0 | VR=0 | RAQI_RESERVED_DIMENSION_VALUES_UNKNOWN=0
 TotalSessionsEndedInBucket [None par SessionTimeBucket] 0=2 | 30=2 | 60=2 | 90=2 | 120=1 | 150=1 | 180=1 | 210=1 | 240=1 | 270=1 | 300=1
-SNOW CHASE relevé 02/11/2026 14:05:13 | partie 13/14 | * = provisoire
+SNOW CHASE relevé 02/11/2026 14:35:02 | partie 13/14 | * = provisoire
 PeakConcurrentPlayers [None par Platform] ERR 2001 Query is not available for Universe with id 10767392366
 PeakConcurrentPlayers [None par OperatingSystem] ERR 2001 Query is not available for Universe with id 10767392366
 SessionDurationSecondsP50 [None par Platform] ERR 2001 Query is not available for Universe with id 10767392366
@@ -141,7 +141,7 @@ ForwardD1Retention [OneDay par Platform] Phone=10-26=0 10-27=0 10-28=0 10-29=0 1
 ForwardD1Retention [OneDay par AgeGroupV2] Age18AndOverToUnder21=10-27=0 10-28=0 | Age21OrOver=10-26=0 10-27=0 10-28=0 10-29=0 10-30=0
 ForwardD1Retention [OneDay par Country] BR=10-26=0 | DE=10-27=0 10-28=0 10-29=0 10-30=0 | GT=10-26=0 10-27=0 | ID=10-29=0 10-30=0 | KZ=10-26=0 | LV=10-26=0 | LY=10-27=0 10-28=0 | NL=10-30=0 | SE=10-28=0 10-29=0 | TH=10-26=0
 ForwardD1Retention [OneDay par AcquisitionSource] SponsoredAds=10-26=0 10-27=0 10-28=0 10-29=0 10-30=0 | Search=10-27=0 10-28=0 10-29=0 | Friends=10-26=0
-SNOW CHASE relevé 02/11/2026 14:05:34 | partie 14/14 | * = provisoire
+SNOW CHASE relevé 02/11/2026 14:35:23 | partie 14/14 | * = provisoire
 RFYPlayThroughRate [OneDay par AgeGroupV2] Age18AndOverToUnder21=10-26=0 10-27=0 10-28=0 10-29=0 10-30=0 | Age21OrOver=10-26=0 10-27=0 10-29=0 10-30=0 10-31=0
 RFYPlayThroughRate [OneDay par Gender] Unknown=10-27=0 10-29=0 | Male=10-26=0 10-27=0 10-29=0 10-31=0 | Female=10-26=0 10-27=0 10-28=0 10-29=0 10-30=0
 RFYDuration0To60 [OneDay par AgeGroupV2] aucune donnée
